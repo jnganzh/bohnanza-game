@@ -12,37 +12,35 @@ interface Props {
   myId: string;
 }
 
-const PHASE_NAMES: Record<string, string> = {
-  [GamePhase.PlantFromHand]: 'Phase 1: Plant Beans',
-  [GamePhase.DrawAndTrade]: 'Phase 2: Draw & Trade',
-  [GamePhase.PlantTradedBeans]: 'Phase 3: Plant Traded Beans',
-  [GamePhase.DrawNewCards]: 'Phase 4: Draw New Cards',
-  [GamePhase.GameOver]: 'Game Over',
+const PHASE_INFO: Record<string, { name: string; icon: string }> = {
+  [GamePhase.PlantFromHand]: { name: 'Plant Beans', icon: '🌱' },
+  [GamePhase.DrawAndTrade]: { name: 'Draw & Trade', icon: '🤝' },
+  [GamePhase.PlantTradedBeans]: { name: 'Plant Traded Beans', icon: '📦' },
+  [GamePhase.DrawNewCards]: { name: 'Draw New Cards', icon: '🃏' },
+  [GamePhase.GameOver]: { name: 'Game Over', icon: '🏆' },
 };
 
 export function PhaseIndicator({
   phase,
   activePlayerId,
   isMyTurn,
-  deckCount,
-  deckExhaustionCount,
   opponents,
-  myId,
 }: Props) {
   const activePlayerName = isMyTurn
     ? 'You'
     : opponents.find((o) => o.id === activePlayerId)?.name || '?';
 
+  const info = PHASE_INFO[phase] || { name: phase, icon: '🫘' };
+
   return (
     <div className={`phase-indicator ${isMyTurn ? 'my-turn' : ''}`}>
       <div className="phase-info">
-        <span className="phase-name">{PHASE_NAMES[phase] || phase}</span>
+        <span className="phase-icon">{info.icon}</span>
+        <span className="phase-name">{info.name}</span>
+        <span className="phase-divider">|</span>
         <span className="phase-player">
-          {isMyTurn ? "Your turn" : `${activePlayerName}'s turn`}
+          {isMyTurn ? '✨ Your turn' : `${activePlayerName}'s turn`}
         </span>
-      </div>
-      <div className="deck-status">
-        Deck: {deckCount} | Reshuffled: {deckExhaustionCount}/3
       </div>
     </div>
   );

@@ -1,50 +1,83 @@
 .bean-field {
-  width: 140px;
-  min-height: 160px;
-  border-radius: 10px;
-  border: 2px solid #444;
-  background: var(--bg-secondary);
+  width: 155px;
+  min-height: 180px;
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(180deg, rgba(22, 33, 62, 0.9) 0%, rgba(26, 26, 46, 0.95) 100%);
   padding: 10px;
   display: flex;
   flex-direction: column;
   gap: 6px;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Colored accent line at top when field has beans */
+.bean-field:not(.empty)::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--field-color, transparent), var(--field-color-dark, transparent));
+  border-radius: 12px 12px 0 0;
 }
 
 .bean-field.empty {
   border-style: dashed;
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
 .bean-field.plantable {
   border-color: #00FF88;
-  box-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.2);
   cursor: pointer;
 }
 
 .bean-field.plantable:hover {
-  box-shadow: 0 0 12px rgba(0, 255, 136, 0.5);
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.35);
+  transform: translateY(-2px);
 }
 
 .field-header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   font-size: 11px;
   color: var(--text-secondary);
 }
 
 .field-count {
+  color: var(--text-secondary);
+  font-size: 11px;
+}
+
+.field-count .count-num {
   font-weight: bold;
   color: var(--text-primary);
+  font-size: 13px;
 }
 
 .field-empty {
   flex: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #666;
+  gap: 6px;
+}
+
+.field-empty-icon {
+  font-size: 28px;
+  opacity: 0.3;
+}
+
+.field-empty-text {
+  color: #555;
   font-style: italic;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .field-content {
@@ -55,57 +88,59 @@
   gap: 6px;
 }
 
-.field-bean-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  font-weight: bold;
-  color: #fff;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+.field-bean-emoji {
+  font-size: 38px;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
+  line-height: 1;
 }
 
 .field-bean-name {
   font-size: 12px;
-  font-weight: bold;
+  font-weight: 700;
   text-align: center;
+  color: var(--field-color, var(--text-primary));
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
 .field-beanometer {
   display: flex;
-  gap: 3px;
+  gap: 4px;
   flex-wrap: wrap;
   justify-content: center;
 }
 
 .meter-tier {
   font-size: 9px;
-  padding: 1px 4px;
-  border-radius: 3px;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.meter-tier.reached {
-  background: rgba(0, 255, 136, 0.3);
-  color: #00FF88;
-}
-
-.harvest-btn {
-  padding: 4px 8px;
+  padding: 2px 5px;
   border-radius: 4px;
-  border: 1px solid #c0392b;
-  background: rgba(192, 57, 43, 0.2);
-  color: #e74c3c;
-  cursor: pointer;
-  font-size: 11px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-secondary);
+  font-weight: 600;
   transition: all 0.2s;
 }
 
+.meter-tier.reached {
+  background: rgba(0, 255, 136, 0.2);
+  color: #00FF88;
+  border: 1px solid rgba(0, 255, 136, 0.3);
+}
+
+.harvest-btn {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(231, 76, 60, 0.4);
+  background: rgba(192, 57, 43, 0.15);
+  color: #ef5350;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  transition: all 0.2s;
+  text-align: center;
+}
+
 .harvest-btn:hover {
-  background: rgba(192, 57, 43, 0.4);
+  background: rgba(192, 57, 43, 0.35);
+  border-color: rgba(231, 76, 60, 0.6);
 }
 
 .plant-pending-options {
@@ -115,16 +150,18 @@
 }
 
 .plant-pending-btn {
-  padding: 4px 8px;
-  border-radius: 4px;
-  border: 1px solid #e67e22;
-  background: rgba(230, 126, 34, 0.2);
+  padding: 5px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(230, 126, 34, 0.4);
+  background: rgba(230, 126, 34, 0.15);
   color: #f39c12;
   cursor: pointer;
   font-size: 11px;
+  font-weight: 600;
   transition: all 0.2s;
 }
 
 .plant-pending-btn:hover {
-  background: rgba(230, 126, 34, 0.4);
+  background: rgba(230, 126, 34, 0.35);
+  border-color: rgba(230, 126, 34, 0.6);
 }

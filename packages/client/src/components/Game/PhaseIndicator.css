@@ -2,40 +2,47 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 16px;
-  background: var(--bg-secondary);
-  border-radius: 8px;
-  border: 1px solid #333;
-  margin-bottom: 8px;
+  padding: 12px 18px;
+  background: linear-gradient(180deg, rgba(22, 33, 62, 0.95) 0%, rgba(26, 26, 46, 0.9) 100%);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.3s;
 }
 
 .phase-indicator.my-turn {
-  border-color: #27ae60;
-  box-shadow: 0 0 8px rgba(39, 174, 96, 0.3);
+  border-color: rgba(46, 204, 113, 0.4);
+  box-shadow: 0 0 16px rgba(46, 204, 113, 0.1);
+  background: linear-gradient(180deg, rgba(22, 43, 32, 0.95) 0%, rgba(26, 26, 46, 0.9) 100%);
 }
 
 .phase-info {
   display: flex;
-  gap: 16px;
+  gap: 10px;
   align-items: center;
 }
 
+.phase-icon {
+  font-size: 20px;
+}
+
 .phase-name {
-  font-weight: bold;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.3px;
+}
+
+.phase-divider {
+  color: rgba(255, 255, 255, 0.15);
   font-size: 16px;
 }
 
 .phase-player {
   color: var(--text-secondary);
   font-size: 14px;
+  font-weight: 500;
 }
 
 .my-turn .phase-player {
-  color: #2ecc71;
-  font-weight: bold;
-}
-
-.deck-status {
-  font-size: 13px;
-  color: var(--text-secondary);
+  color: #66bb6a;
+  font-weight: 700;
 }

@@ -7,47 +7,71 @@
 }
 
 .action-btn {
-  padding: 8px 20px;
-  border-radius: 6px;
+  padding: 10px 22px;
+  border-radius: 8px;
   border: none;
   font-size: 14px;
-  font-weight: bold;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
+  letter-spacing: 0.3px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.action-btn:active {
+  transform: translateY(0);
 }
 
 .action-btn.plant {
-  background: #27ae60;
+  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
   color: white;
 }
 
 .action-btn.plant:hover {
-  background: #2ecc71;
+  background: linear-gradient(135deg, #3dd87a 0%, #2ecc71 100%);
 }
 
 .action-btn.skip {
-  background: #7f8c8d;
+  background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
   color: white;
 }
 
 .action-btn.skip:hover {
-  background: #95a5a6;
+  background: linear-gradient(135deg, #a1b0b1 0%, #95a5a6 100%);
 }
 
 .action-btn.end-trade {
-  background: #2980b9;
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
   color: white;
 }
 
 .action-btn.end-trade:hover {
-  background: #3498db;
+  background: linear-gradient(135deg, #45a3e0 0%, #3498db 100%);
 }
 
 .action-info {
   font-size: 13px;
   color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .action-info.waiting {
   font-style: italic;
+  opacity: 0.7;
+}
+
+.planted-counter {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 2px 8px;
+  border-radius: 4px;
 }

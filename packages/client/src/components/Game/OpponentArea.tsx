@@ -11,36 +11,48 @@ export function OpponentArea({ player, isActive }: Props) {
   return (
     <div className={`opponent-area ${isActive ? 'active' : ''} ${!player.connected ? 'disconnected' : ''}`}>
       <div className="opponent-header">
-        <span className="opponent-name">{player.name}</span>
-        {isActive && <span className="active-badge">Active</span>}
-        {!player.connected && <span className="dc-badge">DC</span>}
-      </div>
-      <div className="opponent-info">
-        <span className="opponent-stat" title="Cards in hand">
-          Hand: {player.handCount}
-        </span>
-        <span className="opponent-stat" title="Gold coins">
-          Gold: {player.goldCoins}
-        </span>
-        {player.pendingPlantingCount > 0 && (
-          <span className="opponent-stat pending">
-            Pending: {player.pendingPlantingCount}
+        <div className="opponent-name-row">
+          <span className="opponent-name">{player.name}</span>
+          {isActive && <span className="active-badge">🎯 Turn</span>}
+          {!player.connected && <span className="dc-badge">DC</span>}
+        </div>
+        <div className="opponent-stats">
+          <span className="opp-stat" title="Cards in hand">
+            🃏 {player.handCount}
           </span>
-        )}
+          <span className="opp-stat gold" title="Gold coins">
+            🪙 {player.goldCoins}
+          </span>
+          {player.pendingPlantingCount > 0 && (
+            <span className="opp-stat pending" title="Pending planting">
+              📦 {player.pendingPlantingCount}
+            </span>
+          )}
+        </div>
       </div>
       <div className="opponent-fields">
         {player.fields.map((field, i) => (
-          <div key={i} className="opponent-field-mini">
+          <div
+            key={i}
+            className={`opponent-field-card ${field.beanType ? '' : 'empty-field'}`}
+            style={
+              field.beanType
+                ? ({ '--opp-field-color': BEAN_VARIETIES[field.beanType].color } as React.CSSProperties)
+                : undefined
+            }
+          >
             {field.beanType ? (
               <>
-                <div
-                  className="field-dot"
-                  style={{ backgroundColor: BEAN_VARIETIES[field.beanType].color }}
-                />
-                <span>{field.cards.length}</span>
+                <span className="opp-field-emoji">
+                  {BEAN_VARIETIES[field.beanType].emoji}
+                </span>
+                <span className="opp-field-count">{field.cards.length}</span>
+                <span className="opp-field-name">
+                  {BEAN_VARIETIES[field.beanType].displayName}
+                </span>
               </>
             ) : (
-              <span className="empty-field-mini">--</span>
+              <span className="opp-field-empty">🌱</span>
             )}
           </div>
         ))}

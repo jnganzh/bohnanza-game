@@ -24,5 +24,7 @@ export interface BeanVariety {
   totalCards: number;
   displayName: string;
   color: string;
+  colorDark: string;
+  emoji: string;
   beanometer: BeanometerTier[];
 }

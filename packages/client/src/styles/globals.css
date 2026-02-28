@@ -1,17 +1,17 @@
 :root {
-  --blue-bean: #4A90D9;
-  --chili-bean: #E74C3C;
-  --stink-bean: #8B6914;
-  --green-bean: #27AE60;
-  --soy-bean: #F1C40F;
-  --black-eyed-bean: #2C3E50;
-  --red-bean: #C0392B;
-  --garden-bean: #9B59B6;
-  --gold-coin: #F5A623;
-  --bg-primary: #1a1a2e;
+  --blue-bean: #5B9FE3;
+  --chili-bean: #EF5350;
+  --stink-bean: #A68B3C;
+  --green-bean: #4CAF50;
+  --soy-bean: #FFD54F;
+  --black-eyed-bean: #78909C;
+  --red-bean: #E53935;
+  --garden-bean: #AB47BC;
+  --gold-coin: #FFD54F;
+  --bg-primary: #0f1523;
   --bg-secondary: #16213e;
-  --text-primary: #eee;
-  --text-secondary: #aaa;
+  --text-primary: #e8e8e8;
+  --text-secondary: #8899aa;
 }
 
 * {
@@ -21,10 +21,12 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
   background-color: var(--bg-primary);
   color: var(--text-primary);
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .app {
@@ -33,4 +35,27 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Selection color */
+::selection {
+  background: rgba(91, 159, 227, 0.3);
 }

@@ -1,21 +1,39 @@
 .player-hand {
-  margin: 12px 0;
+  margin: 14px 0;
 }
 
 .hand-label {
   font-size: 13px;
   color: var(--text-secondary);
   margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .hand-hint {
   font-style: italic;
-  color: #888;
+  color: #666;
+  font-size: 12px;
 }
 
 .hand-cards {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   overflow-x: auto;
-  padding: 4px 0;
+  padding: 6px 0;
+}
+
+.hand-cards::-webkit-scrollbar {
+  height: 4px;
+}
+
+.hand-cards::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 2px;
+}
+
+.hand-cards::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
 }

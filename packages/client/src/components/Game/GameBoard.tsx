@@ -1,5 +1,5 @@
 import { useGameStore } from '../../stores/useGameStore.js';
-import { GamePhase } from '@bohnanza/shared';
+import { GamePhase, BEAN_VARIETIES } from '@bohnanza/shared';
 import { PlayerHand } from './PlayerHand.js';
 import { BeanFieldComp } from './BeanField.js';
 import { OpponentArea } from './OpponentArea.js';
@@ -40,29 +40,38 @@ export function GameBoard() {
 
       <div className="game-main">
         <div className="game-left">
-          <div className="opponents-area">
-            {gameState.opponents.map((opp) => (
-              <OpponentArea
-                key={opp.id}
-                player={opp}
-                isActive={opp.id === gameState.turn.activePlayerId}
-              />
-            ))}
+          <div className="opponents-section">
+            <div className="section-label">Opponents</div>
+            <div className="opponents-area">
+              {gameState.opponents.map((opp) => (
+                <OpponentArea
+                  key={opp.id}
+                  player={opp}
+                  isActive={opp.id === gameState.turn.activePlayerId}
+                />
+              ))}
+            </div>
           </div>
 
           <div className="center-area">
             <div className="deck-info">
               <div className="deck-pile">
                 <div className="deck-card">
-                  <span>{gameState.deckCount}</span>
+                  <span className="deck-icon">🫘</span>
+                  <span className="deck-num">{gameState.deckCount}</span>
                 </div>
                 <span className="deck-label">
-                  Deck (reshuffled {gameState.deckExhaustionCount}/3)
+                  Draw Pile
+                  {gameState.deckExhaustionCount > 0 && (
+                    <span className="reshuffle-badge">
+                      ♻️ {gameState.deckExhaustionCount}/3
+                    </span>
+                  )}
                 </span>
               </div>
               <div className="discard-pile">
                 <div className="discard-card">
-                  <span>{gameState.discardPileCount}</span>
+                  <span className="discard-num">{gameState.discardPileCount}</span>
                 </div>
                 <span className="deck-label">Discard</span>
               </div>
@@ -77,38 +86,45 @@ export function GameBoard() {
           </div>
 
           <div className="my-area">
-            <div className="my-fields">
-              {gameState.myFields.map((field, i) => (
-                <BeanFieldComp
-                  key={i}
-                  field={field}
-                  fieldIndex={i}
-                  isMyField={true}
-                  phase={gameState.turn.phase}
-                  isMyTurn={isMyTurn}
-                  pendingCards={gameState.myPendingPlanting}
-                />
-              ))}
-              {!gameState.myHasThirdField && (
-                <div className="buy-field-slot">
-                  <BuyThirdFieldButton gold={gameState.myGoldCoins} />
+            <div className="my-fields-section">
+              <div className="section-label">Your Fields</div>
+              <div className="my-fields">
+                {gameState.myFields.map((field, i) => (
+                  <BeanFieldComp
+                    key={i}
+                    field={field}
+                    fieldIndex={i}
+                    isMyField={true}
+                    phase={gameState.turn.phase}
+                    isMyTurn={isMyTurn}
+                    pendingCards={gameState.myPendingPlanting}
+                  />
+                ))}
+                {!gameState.myHasThirdField && (
+                  <div className="buy-field-slot">
+                    <BuyThirdFieldButton gold={gameState.myGoldCoins} />
+                  </div>
+                )}
+                <div className="gold-counter">
+                  <span className="gold-emoji">🪙</span>
+                  <span className="gold-amount">{gameState.myGoldCoins}</span>
+                  <span className="gold-label">Gold</span>
                 </div>
-              )}
-              <div className="gold-counter">
-                <span className="gold-icon">$</span>
-                <span className="gold-amount">{gameState.myGoldCoins}</span>
               </div>
             </div>
 
             {isPlantPending && gameState.myPendingPlanting.length > 0 && (
               <div className="pending-area">
-                <h4>Must plant these beans:</h4>
+                <h4>📦 Must plant these beans:</h4>
                 <div className="pending-cards">
-                  {gameState.myPendingPlanting.map((card) => (
-                    <div key={card.id} className="pending-card-info">
-                      {card.type}
-                    </div>
-                  ))}
+                  {gameState.myPendingPlanting.map((card) => {
+                    const v = BEAN_VARIETIES[card.type];
+                    return (
+                      <div key={card.id} className="pending-card-info">
+                        <span>{v.emoji}</span> {v.displayName}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -145,9 +161,9 @@ function BuyThirdFieldButton({ gold }: { gold: number }) {
       onClick={() => socket.emit('game:buy-third-field')}
       title={gold < 3 ? `Need 3 gold (have ${gold})` : 'Buy 3rd field for 3 gold'}
     >
-      Buy 3rd Field
-      <br />
-      <small>(3 gold)</small>
+      <span className="buy-field-icon">🌾</span>
+      <span>Buy 3rd Field</span>
+      <small>3 🪙</small>
     </button>
   );
 }
