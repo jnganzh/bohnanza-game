@@ -1,0 +1,85 @@
+.opponent-area {
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  border: 1px solid #333;
+  min-width: 160px;
+  transition: border-color 0.2s;
+}
+
+.opponent-area.active {
+  border-color: #3498db;
+  box-shadow: 0 0 6px rgba(52, 152, 219, 0.3);
+}
+
+.opponent-area.disconnected {
+  opacity: 0.5;
+}
+
+.opponent-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.opponent-name {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.active-badge {
+  background: #3498db;
+  color: white;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+}
+
+.dc-badge {
+  background: #e74c3c;
+  color: white;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+}
+
+.opponent-info {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.opponent-stat {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.opponent-stat.pending {
+  color: #e67e22;
+}
+
+.opponent-fields {
+  display: flex;
+  gap: 8px;
+}
+
+.opponent-field-mini {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  padding: 2px 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+.field-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.empty-field-mini {
+  color: #555;
+}

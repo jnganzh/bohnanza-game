@@ -1,0 +1,22 @@
+{
+  "name": "bohnanza-game",
+  "private": true,
+  "workspaces": [
+    "packages/shared",
+    "packages/server",
+    "packages/client"
+  ],
+  "scripts": {
+    "dev:server": "npm run dev -w @bohnanza/server",
+    "dev:client": "npm run dev -w @bohnanza/client",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "build": "npm run build -w @bohnanza/shared && npm run build -w @bohnanza/server && npm run build -w @bohnanza/client",
+    "start": "NODE_ENV=production node packages/server/dist/index.js",
+    "test": "npm test -w @bohnanza/shared",
+    "test:all": "npm test --workspaces --if-present"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "typescript": "^5.7.0"
+  }
+}

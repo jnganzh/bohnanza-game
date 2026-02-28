@@ -1,0 +1,21 @@
+.player-hand {
+  margin: 12px 0;
+}
+
+.hand-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.hand-hint {
+  font-style: italic;
+  color: #888;
+}
+
+.hand-cards {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 4px 0;
+}

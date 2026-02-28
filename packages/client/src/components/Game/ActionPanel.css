@@ -1,0 +1,53 @@
+.action-panel {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 0;
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  padding: 8px 20px;
+  border-radius: 6px;
+  border: none;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.action-btn.plant {
+  background: #27ae60;
+  color: white;
+}
+
+.action-btn.plant:hover {
+  background: #2ecc71;
+}
+
+.action-btn.skip {
+  background: #7f8c8d;
+  color: white;
+}
+
+.action-btn.skip:hover {
+  background: #95a5a6;
+}
+
+.action-btn.end-trade {
+  background: #2980b9;
+  color: white;
+}
+
+.action-btn.end-trade:hover {
+  background: #3498db;
+}
+
+.action-info {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.action-info.waiting {
+  font-style: italic;
+}

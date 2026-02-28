@@ -1,0 +1,55 @@
+import { create } from 'zustand';
+
+interface RoomInfo {
+  id: string;
+  playerCount: number;
+  maxPlayers: number;
+  hostName: string;
+}
+
+interface RoomPlayer {
+  id: string;
+  name: string;
+}
+
+interface LobbyStore {
+  playerName: string;
+  roomId: string | null;
+  rooms: RoomInfo[];
+  roomPlayers: RoomPlayer[];
+  maxPlayers: number;
+  hostId: string | null;
+  error: string | null;
+
+  setPlayerName: (name: string) => void;
+  setRoomId: (id: string | null) => void;
+  setRooms: (rooms: RoomInfo[]) => void;
+  setRoomPlayers: (players: RoomPlayer[], maxPlayers: number, hostId: string) => void;
+  setError: (error: string | null) => void;
+  reset: () => void;
+}
+
+export const useLobbyStore = create<LobbyStore>((set) => ({
+  playerName: '',
+  roomId: null,
+  rooms: [],
+  roomPlayers: [],
+  maxPlayers: 5,
+  hostId: null,
+  error: null,
+
+  setPlayerName: (name) => set({ playerName: name }),
+  setRoomId: (id) => set({ roomId: id }),
+  setRooms: (rooms) => set({ rooms }),
+  setRoomPlayers: (players, maxPlayers, hostId) =>
+    set({ roomPlayers: players, maxPlayers, hostId }),
+  setError: (error) => set({ error }),
+  reset: () =>
+    set({
+      roomId: null,
+      roomPlayers: [],
+      maxPlayers: 5,
+      hostId: null,
+      error: null,
+    }),
+}));

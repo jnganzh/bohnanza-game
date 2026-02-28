@@ -1,0 +1,179 @@
+.game-board {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+}
+
+.action-error {
+  background: #e74c3c;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  text-align: center;
+  margin: 4px 0;
+  animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.game-main {
+  display: flex;
+  flex: 1;
+  gap: 12px;
+}
+
+.game-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.game-right {
+  width: 320px;
+  flex-shrink: 0;
+}
+
+.opponents-area {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.center-area {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+}
+
+.deck-info {
+  display: flex;
+  gap: 16px;
+}
+
+.deck-pile, .discard-pile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.deck-card, .discard-card {
+  width: 60px;
+  height: 84px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.deck-card {
+  background: linear-gradient(135deg, #F5A623, #b8860b);
+  border: 2px solid #DAA520;
+  color: #fff;
+}
+
+.discard-card {
+  background: var(--bg-secondary);
+  border: 2px solid #444;
+  color: var(--text-secondary);
+}
+
+.deck-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.my-area {
+  border-top: 1px solid #333;
+  padding-top: 12px;
+}
+
+.my-fields {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.gold-counter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  border: 1px solid #DAA520;
+}
+
+.gold-icon {
+  font-size: 24px;
+  color: var(--gold-coin);
+  font-weight: bold;
+}
+
+.gold-amount {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--gold-coin);
+}
+
+.buy-field-slot {
+  display: flex;
+  align-items: center;
+}
+
+.buy-field-btn {
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 2px dashed #444;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.buy-field-btn:hover:not(:disabled) {
+  border-color: var(--gold-coin);
+  color: var(--gold-coin);
+}
+
+.buy-field-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pending-area {
+  background: var(--bg-secondary);
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  border: 1px solid #e67e22;
+}
+
+.pending-area h4 {
+  color: #e67e22;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.pending-cards {
+  display: flex;
+  gap: 6px;
+}
+
+.pending-card-info {
+  background: rgba(230, 126, 34, 0.2);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}

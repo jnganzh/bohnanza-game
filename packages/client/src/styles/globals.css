@@ -1,0 +1,36 @@
+:root {
+  --blue-bean: #4A90D9;
+  --chili-bean: #E74C3C;
+  --stink-bean: #8B6914;
+  --green-bean: #27AE60;
+  --soy-bean: #F1C40F;
+  --black-eyed-bean: #2C3E50;
+  --red-bean: #C0392B;
+  --garden-bean: #9B59B6;
+  --gold-coin: #F5A623;
+  --bg-primary: #1a1a2e;
+  --bg-secondary: #16213e;
+  --text-primary: #eee;
+  --text-secondary: #aaa;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}

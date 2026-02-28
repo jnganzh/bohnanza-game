@@ -1,0 +1,130 @@
+.bean-field {
+  width: 140px;
+  min-height: 160px;
+  border-radius: 10px;
+  border: 2px solid #444;
+  background: var(--bg-secondary);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.bean-field.empty {
+  border-style: dashed;
+}
+
+.bean-field.plantable {
+  border-color: #00FF88;
+  box-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
+  cursor: pointer;
+}
+
+.bean-field.plantable:hover {
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.5);
+}
+
+.field-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.field-count {
+  font-weight: bold;
+  color: var(--text-primary);
+}
+
+.field-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  font-style: italic;
+  font-size: 13px;
+}
+
+.field-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.field-bean-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: bold;
+  color: #fff;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.field-bean-name {
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.field-beanometer {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.meter-tier {
+  font-size: 9px;
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.meter-tier.reached {
+  background: rgba(0, 255, 136, 0.3);
+  color: #00FF88;
+}
+
+.harvest-btn {
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #c0392b;
+  background: rgba(192, 57, 43, 0.2);
+  color: #e74c3c;
+  cursor: pointer;
+  font-size: 11px;
+  transition: all 0.2s;
+}
+
+.harvest-btn:hover {
+  background: rgba(192, 57, 43, 0.4);
+}
+
+.plant-pending-options {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.plant-pending-btn {
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #e67e22;
+  background: rgba(230, 126, 34, 0.2);
+  color: #f39c12;
+  cursor: pointer;
+  font-size: 11px;
+  transition: all 0.2s;
+}
+
+.plant-pending-btn:hover {
+  background: rgba(230, 126, 34, 0.4);
+}
