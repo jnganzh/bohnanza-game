@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { TradeOffer, BeanType, BeanCard as BeanCardType } from '@bohnanza/shared';
 import { TradeOfferStatus, TradeOfferType, BEAN_VARIETIES } from '@bohnanza/shared';
+import { BeanCard } from '../Cards/BeanCard.js';
 import { socket } from '../../socket/socketClient.js';
 import './TradeOfferCard.css';
 
@@ -9,6 +10,7 @@ interface Props {
   myId: string;
   players: { id: string; name: string }[];
   myHand: BeanCardType[];
+  faceUpCards?: BeanCardType[];
 }
 
 function BeanTag({ beanType, className }: { beanType: BeanType; className?: string }) {
@@ -36,7 +38,7 @@ function canFulfillRequest(hand: BeanCardType[], requestedTypes: BeanType[]): bo
 
 const TRADE_TIMEOUT_MS = 30000; // 30 seconds
 
-export function TradeOfferCard({ offer, myId, players, myHand }: Props) {
+export function TradeOfferCard({ offer, myId, players, myHand, faceUpCards = [] }: Props) {
   const fromName =
     players.find((p) => p.id === offer.fromPlayerId)?.name || '?';
   const toName = offer.toPlayerId
@@ -128,11 +130,19 @@ export function TradeOfferCard({ offer, myId, players, myHand }: Props) {
           {offer.offering.fromHand.map((t, i) => (
             <BeanTag key={`h${i}`} beanType={t} />
           ))}
-          {offer.offering.fromFaceUp.length > 0 && (
-            <span className="offer-card-tag face-up">
-              +{offer.offering.fromFaceUp.length} face-up 🃏
-            </span>
-          )}
+          {offer.offering.fromFaceUp.map((cardId, i) => {
+            const card = faceUpCards.find((c) => c.id === cardId);
+            return card ? (
+              <div key={`fu${i}`} className="face-up-card-wrapper">
+                <BeanCard card={card} small />
+                <span className="face-up-badge">FACE UP</span>
+              </div>
+            ) : (
+              <span key={`fu${i}`} className="offer-card-tag face-up">
+                face-up 🃏
+              </span>
+            );
+          })}
         </div>
         {offer.type === TradeOfferType.Trade &&
           offer.requesting.fromHand.length > 0 && (

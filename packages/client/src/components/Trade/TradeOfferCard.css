@@ -95,6 +95,31 @@
   color: var(--gold-light);
 }
 
+.face-up-card-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.face-up-card-wrapper .bean-card {
+  border: 2px solid var(--gold-light);
+}
+
+.face-up-badge {
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--gold-light);
+  color: #1a1410;
+  font-size: 8px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 3px;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  z-index: 1;
+}
+
 .offer-actions {
   display: flex;
   gap: 6px;

@@ -32,6 +32,7 @@ export function TradePanel({ gameState, isMyTurn }: Props) {
             offer={offer}
             myId={gameState.myId}
             myHand={gameState.myHand}
+            faceUpCards={gameState.turn.drawnFaceUpCards}
             players={[
               { id: gameState.myId, name: 'You' },
               ...gameState.opponents.map((o) => ({ id: o.id, name: o.name })),
