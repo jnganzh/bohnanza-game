@@ -674,7 +674,9 @@ describe('GameEngine', () => {
 
         // p2 should have the donated card
         expect(donateState.players[1].pendingPlanting).toHaveLength(1);
-        expect(donateState.turn.drawnFaceUpCards).toHaveLength(faceUp.length - 1);
+        // Card stays in drawnFaceUpCards but is marked as claimed
+        expect(donateState.turn.drawnFaceUpCards).toHaveLength(faceUp.length);
+        expect(donateState.turn.keptFaceUpCardIds).toContain(faceUp[0].id);
       }
     });
   });

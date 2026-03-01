@@ -27,7 +27,7 @@ export function FaceUpCards({ cards, isMyTurn, keptCardIds }: Props) {
                 onClick={() => !isKept && toggleFaceUpCard(card.id)}
               />
               {isKept ? (
-                <span className="kept-badge">Kept ✓</span>
+                <span className="kept-badge">Claimed ✓</span>
               ) : (
                 isMyTurn && (
                   <button

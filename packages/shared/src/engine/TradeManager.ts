@@ -50,13 +50,16 @@ export class TradeManager {
       cardsForTo.push(result.card);
     }
 
-    // Move face-up cards from offering player
-    let faceUpCards = [...state.turn.drawnFaceUpCards];
+    // Move face-up cards from offering player (keep them visible but mark as claimed)
+    const tradedFaceUpIds: string[] = [];
     for (const cardId of offer.offering.fromFaceUp) {
-      const idx = faceUpCards.findIndex((c) => c.id === cardId);
-      if (idx === -1) return { code: 'CARD_MISSING', message: 'Face-up card no longer available' };
-      cardsForTo.push(faceUpCards[idx]);
-      faceUpCards = [...faceUpCards.slice(0, idx), ...faceUpCards.slice(idx + 1)];
+      const card = state.turn.drawnFaceUpCards.find((c) => c.id === cardId);
+      if (!card) return { code: 'CARD_MISSING', message: 'Face-up card no longer available' };
+      if (state.turn.keptFaceUpCardIds.includes(cardId)) {
+        return { code: 'CARD_MISSING', message: 'Face-up card already claimed' };
+      }
+      cardsForTo.push(card);
+      tradedFaceUpIds.push(cardId);
     }
 
     // Move cards from accepting player (for trades, not donations)
@@ -101,7 +104,7 @@ export class TradeManager {
       players: newPlayers,
       turn: {
         ...state.turn,
-        drawnFaceUpCards: faceUpCards,
+        keptFaceUpCardIds: [...state.turn.keptFaceUpCardIds, ...tradedFaceUpIds],
         activeTradeOffers: newOffers,
       },
     };
