@@ -18,25 +18,34 @@ export function ActionPanel({ gameState, isMyTurn }: Props) {
           {gameState.myHand.length > 0 && (() => {
             const card = gameState.myHand[0];
             const variety = BEAN_VARIETIES[card.type];
+            let fieldIdx = gameState.myFields.findIndex(
+              (f) => f.beanType === card.type
+            );
+            if (fieldIdx === -1) {
+              fieldIdx = gameState.myFields.findIndex(
+                (f) => f.beanType === null
+              );
+            }
+            const canAutoPlant = fieldIdx !== -1;
             return (
-              <button
-                className="action-btn plant"
-                onClick={() => {
-                  let fieldIdx = gameState.myFields.findIndex(
-                    (f) => f.beanType === card.type
-                  );
-                  if (fieldIdx === -1) {
-                    fieldIdx = gameState.myFields.findIndex(
-                      (f) => f.beanType === null
-                    );
-                  }
-                  if (fieldIdx !== -1) {
-                    socket.emit('game:plant-bean', { fieldIndex: fieldIdx });
-                  }
-                }}
-              >
-                {variety.emoji} Plant {variety.displayName}
-              </button>
+              <>
+                <button
+                  className={`action-btn plant ${!canAutoPlant ? 'disabled' : ''}`}
+                  disabled={!canAutoPlant}
+                  onClick={() => {
+                    if (canAutoPlant) {
+                      socket.emit('game:plant-bean', { fieldIndex: fieldIdx });
+                    }
+                  }}
+                >
+                  {variety.emoji} Plant {variety.displayName}
+                </button>
+                {!canAutoPlant && (
+                  <span className="action-hint">
+                    ⚠️ Harvest a field first to make room
+                  </span>
+                )}
+              </>
             );
           })()}
           {!mustPlantFirst && (

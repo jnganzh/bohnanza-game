@@ -28,10 +28,21 @@ export function BeanFieldComp({
   const isEmpty = field.cards.length === 0;
   const variety = field.beanType ? BEAN_VARIETIES[field.beanType] : null;
 
-  const canPlant =
+  const isPlantPhase =
     isMyField &&
     isMyTurn &&
     phase === GamePhase.PlantFromHand;
+
+  // A field can accept the top hand card if:
+  // - it's empty (beanType is null), OR
+  // - it already has the same bean type
+  const canAcceptTopCard =
+    isPlantPhase &&
+    topHandCard != null &&
+    (field.beanType === null || field.beanType === topHandCard.type);
+
+  // canPlant: field is valid for planting the top card
+  const canPlant = canAcceptTopCard;
 
   // Smart plant: if the field has the same type as the top hand card, clicking plants
   const canSmartPlant = canPlant && !isEmpty && topHandCard && topHandCard.type === field.beanType;
