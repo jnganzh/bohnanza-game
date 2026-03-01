@@ -96,6 +96,7 @@ export function BeanFieldComp({
         </div>
       ) : (
         <div className="field-planted" style={{ '--bean-color': variety?.color } as React.CSSProperties}>
+          <span className="field-total-count">{variety?.totalCards}</span>
           <div className="planted-emoji">{variety?.emoji}</div>
           <div className="planted-name">{variety?.displayName}</div>
           <div className="planted-count">{field.cards.length} cards</div>
