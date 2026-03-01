@@ -31,9 +31,9 @@ export class TradeManager {
       return { code: 'TRADE_NOT_PENDING', message: 'Trade is no longer pending' };
     }
 
-    // Determine who is accepting
-    if (offer.toPlayerId && offer.toPlayerId !== acceptingPlayerId) {
-      return { code: 'NOT_TARGET', message: 'You are not the target of this trade' };
+    // All trades are open — anyone (except the proposer) can accept
+    if (offer.fromPlayerId === acceptingPlayerId) {
+      return { code: 'SELF_ACCEPT', message: 'You cannot accept your own trade' };
     }
 
     const fromPlayer = state.players.find((p) => p.id === offer.fromPlayerId)!;
@@ -96,7 +96,7 @@ export class TradeManager {
 
     // Update trade status
     const newOffers = state.turn.activeTradeOffers.map((o) =>
-      o.id === tradeId ? { ...o, status: TradeOfferStatus.Accepted, toPlayerId: acceptingPlayerId } : o
+      o.id === tradeId ? { ...o, status: TradeOfferStatus.Accepted } : o
     );
 
     return {
@@ -121,35 +121,27 @@ export class TradeManager {
       return { code: 'TRADE_NOT_PENDING', message: 'Trade is no longer pending' };
     }
 
-    let newOffers: TradeOffer[];
-    if (offer.toPlayerId !== null) {
-      // Targeted trade — full rejection
-      newOffers = state.turn.activeTradeOffers.map((o) =>
-        o.id === tradeId ? { ...o, status: TradeOfferStatus.Rejected } : o
-      );
-    } else {
-      // Open trade — per-player rejection; offer stays pending for others
-      if (offer.rejectedByPlayerIds.includes(rejectingPlayerId)) {
-        return { code: 'ALREADY_REJECTED', message: 'You already rejected this trade' };
-      }
-
-      const newRejected = [...offer.rejectedByPlayerIds, rejectingPlayerId];
-      // If every non-proposer has rejected, mark the whole offer as rejected
-      const otherPlayerIds = state.players
-        .filter((p) => p.id !== offer.fromPlayerId)
-        .map((p) => p.id);
-      const allRejected = otherPlayerIds.every((id) => newRejected.includes(id));
-
-      newOffers = state.turn.activeTradeOffers.map((o) =>
-        o.id === tradeId
-          ? {
-              ...o,
-              rejectedByPlayerIds: newRejected,
-              status: allRejected ? TradeOfferStatus.Rejected : TradeOfferStatus.Pending,
-            }
-          : o
-      );
+    // All trades are open — per-player rejection; offer stays pending for others
+    if (offer.rejectedByPlayerIds.includes(rejectingPlayerId)) {
+      return { code: 'ALREADY_REJECTED', message: 'You already rejected this trade' };
     }
+
+    const newRejected = [...offer.rejectedByPlayerIds, rejectingPlayerId];
+    // If every non-proposer has rejected, mark the whole offer as rejected
+    const otherPlayerIds = state.players
+      .filter((p) => p.id !== offer.fromPlayerId)
+      .map((p) => p.id);
+    const allRejected = otherPlayerIds.every((id) => newRejected.includes(id));
+
+    const newOffers = state.turn.activeTradeOffers.map((o) =>
+      o.id === tradeId
+        ? {
+            ...o,
+            rejectedByPlayerIds: newRejected,
+            status: allRejected ? TradeOfferStatus.Rejected : TradeOfferStatus.Pending,
+          }
+        : o
+    );
 
     return {
       ...state,

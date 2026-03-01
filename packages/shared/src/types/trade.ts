@@ -22,7 +22,8 @@ export interface TradeOffer {
   id: string;
   type: TradeOfferType;
   fromPlayerId: string;
-  toPlayerId: string | null;
+  /** @deprecated All offers are now broadcast to everyone (open offers). Always null. */
+  toPlayerId: null;
   offering: TradeOfferSide;
   requesting: TradeOfferSide;
   status: TradeOfferStatus;

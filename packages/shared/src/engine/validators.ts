@@ -64,8 +64,8 @@ export function validateTrade(state: GameState, offer: TradeOffer): string | nul
   }
 
   const activeId = state.turn.activePlayerId;
-  if (offer.fromPlayerId !== activeId && offer.toPlayerId !== activeId) {
-    return 'All trades must involve the active player';
+  if (offer.fromPlayerId !== activeId) {
+    return 'Only the active player can propose trades';
   }
 
   if (offer.fromPlayerId !== activeId && offer.offering.fromFaceUp.length > 0) {
@@ -92,18 +92,7 @@ export function validateTrade(state: GameState, offer: TradeOffer): string | nul
     }
   }
 
-  // For trades (not donations), verify the target has the requested cards
-  if (offer.type === TradeOfferType.Trade && offer.toPlayerId) {
-    const toPlayer = state.players.find((p) => p.id === offer.toPlayerId);
-    if (!toPlayer) return 'Target player not found';
-
-    const toHandCopy = [...toPlayer.hand];
-    for (const beanType of offer.requesting.fromHand) {
-      const idx = toHandCopy.findIndex((c) => c.type === beanType);
-      if (idx === -1) return 'Target player does not have the requested cards';
-      toHandCopy.splice(idx, 1);
-    }
-  }
+  // For open trades, requested cards are validated at acceptance time
 
   return null;
 }

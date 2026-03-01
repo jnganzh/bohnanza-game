@@ -18,12 +18,10 @@ export interface ClientToServerEvents {
 
   'game:keep-face-up-card': (data: { cardId: string }) => void;
   'game:propose-trade': (data: {
-    toPlayerId: string | null;
     offering: { fromHand: BeanType[]; fromFaceUp: string[] };
     requesting: { fromHand: BeanType[] };
   }) => void;
   'game:propose-donation': (data: {
-    toPlayerId: string | null;
     cards: { fromHand: BeanType[]; fromFaceUp: string[] };
   }) => void;
   'game:accept-trade': (data: { tradeId: string }) => void;

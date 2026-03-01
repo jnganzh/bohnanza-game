@@ -100,7 +100,6 @@ export class GameSession {
   handleProposeTrade(
     playerId: string,
     data: {
-      toPlayerId: string | null;
       offering: { fromHand: BeanType[]; fromFaceUp: string[] };
       requesting: { fromHand: BeanType[] };
     }
@@ -121,7 +120,7 @@ export class GameSession {
       id: nanoid(8),
       type: TradeOfferType.Trade,
       fromPlayerId: playerId,
-      toPlayerId: data.toPlayerId,
+      toPlayerId: null,
       offering: data.offering,
       requesting: { fromHand: data.requesting.fromHand, fromFaceUp: [] },
       status: TradeOfferStatus.Pending,
@@ -143,7 +142,6 @@ export class GameSession {
   handleProposeDonation(
     playerId: string,
     data: {
-      toPlayerId: string | null;
       cards: { fromHand: BeanType[]; fromFaceUp: string[] };
     }
   ): void {
@@ -151,7 +149,7 @@ export class GameSession {
       id: nanoid(8),
       type: TradeOfferType.Donation,
       fromPlayerId: playerId,
-      toPlayerId: data.toPlayerId,
+      toPlayerId: null,
       offering: data.cards,
       requesting: { fromHand: [], fromFaceUp: [] },
       status: TradeOfferStatus.Pending,

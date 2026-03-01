@@ -19,7 +19,6 @@ export function TradeOfferForm({ gameState, isMyTurn }: Props) {
     clearSelection,
   } = useTradeStore();
 
-  const [targetPlayer, setTargetPlayer] = useState<string>('');
   const [isDonation, setIsDonation] = useState(false);
   const [wantedBeans, setWantedBeans] = useState<Record<string, number>>({});
 
@@ -51,7 +50,6 @@ export function TradeOfferForm({ gameState, isMyTurn }: Props) {
 
     if (isDonation) {
       socket.emit('game:propose-donation', {
-        toPlayerId: targetPlayer || null,
         cards: {
           fromHand: offeringFromHand,
           fromFaceUp: selectedFaceUpCards,
@@ -67,7 +65,6 @@ export function TradeOfferForm({ gameState, isMyTurn }: Props) {
       }
 
       socket.emit('game:propose-trade', {
-        toPlayerId: targetPlayer || null,
         offering: {
           fromHand: offeringFromHand,
           fromFaceUp: selectedFaceUpCards,
@@ -78,7 +75,6 @@ export function TradeOfferForm({ gameState, isMyTurn }: Props) {
 
     clearSelection();
     setWantedBeans({});
-    setTargetPlayer('');
   };
 
   // Get display info for selected cards
@@ -116,24 +112,6 @@ export function TradeOfferForm({ gameState, isMyTurn }: Props) {
         >
           Donate
         </button>
-      </div>
-
-      {/* Target player */}
-      <div className="form-section">
-        <label>
-          To:
-        </label>
-        <select
-          value={targetPlayer}
-          onChange={(e) => setTargetPlayer(e.target.value)}
-        >
-          <option value="">{isDonation ? 'All players (fastest fingers!)' : 'Open offer (anyone)'}</option>
-          {gameState.opponents.map((opp) => (
-            <option key={opp.id} value={opp.id}>
-              {opp.name}
-            </option>
-          ))}
-        </select>
       </div>
 
       {/* Selected offering display */}

@@ -41,10 +41,6 @@ const TRADE_TIMEOUT_MS = 30000; // 30 seconds
 export function TradeOfferCard({ offer, myId, players, myHand, faceUpCards = [] }: Props) {
   const fromName =
     players.find((p) => p.id === offer.fromPlayerId)?.name || '?';
-  const toName = offer.toPlayerId
-    ? players.find((p) => p.id === offer.toPlayerId)?.name || '?'
-    : 'anyone';
-
   // Trade timer
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   useEffect(() => {
@@ -72,8 +68,7 @@ export function TradeOfferCard({ offer, myId, players, myHand, faceUpCards = [] 
     : 'offer-incoming';
 
   const isPending = offer.status === TradeOfferStatus.Pending;
-  const isTargetedAtMe =
-    offer.toPlayerId === null || offer.toPlayerId === myId;
+  const isTargetedAtMe = true; // All offers are open to everyone
   const isNotFromMe = offer.fromPlayerId !== myId;
   const iAlreadyRejected = (offer.rejectedByPlayerIds ?? []).includes(myId);
 
@@ -111,12 +106,9 @@ export function TradeOfferCard({ offer, myId, players, myHand, faceUpCards = [] 
         <span className="offer-from">{fromName}</span>
         <span className="offer-arrow">
           {offer.type === TradeOfferType.Donation
-            ? (offer.toPlayerId ? 'donates to' : '🎉 donates — grab it!')
-            : 'trades with'}
+            ? '🎉 donates — grab it!'
+            : 'offers to trade'}
         </span>
-        {(offer.type !== TradeOfferType.Donation || offer.toPlayerId) && (
-          <span className="offer-to">{toName}</span>
-        )}
         {isPending && timeLeft !== null && (
           <span className={`offer-timer ${timeLeft < 10000 ? 'urgent' : ''}`}>
             {Math.ceil(timeLeft / 1000)}s
