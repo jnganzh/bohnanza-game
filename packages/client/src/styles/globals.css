@@ -85,3 +85,13 @@ body {
 ::selection {
   background: rgba(212, 168, 50, 0.3);
 }
+
+/* ============================================
+   MOBILE RESPONSIVE (iPhone / small screens)
+   ============================================ */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+    overflow-x: hidden;
+  }
+}

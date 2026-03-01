@@ -143,7 +143,7 @@ export class GameSession {
   handleProposeDonation(
     playerId: string,
     data: {
-      toPlayerId: string;
+      toPlayerId: string | null;
       cards: { fromHand: BeanType[]; fromFaceUp: string[] };
     }
   ): void {

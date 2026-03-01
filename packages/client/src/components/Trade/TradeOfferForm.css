@@ -253,3 +253,27 @@
   opacity: 0.3;
   cursor: not-allowed;
 }
+
+@media (max-width: 768px) {
+  .trade-form {
+    padding: 8px;
+    gap: 8px;
+  }
+
+  .bean-picker {
+    max-height: 150px;
+  }
+
+  .bean-pick-name {
+    font-size: 10px;
+  }
+
+  .bean-pick-emoji {
+    font-size: 12px;
+  }
+
+  .propose-btn {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+}

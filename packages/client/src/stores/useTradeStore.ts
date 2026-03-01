@@ -20,7 +20,14 @@ export const useTradeStore = create<TradeStore>((set) => ({
   selectedFaceUpCards: [],
 
   addOffer: (offer) =>
-    set((s) => ({ offers: [...s.offers, offer] })),
+    set((s) => {
+      const newOffers = [...s.offers, offer];
+      // Keep only 5 most recent offers visible
+      if (newOffers.length > 5) {
+        return { offers: newOffers.slice(-5) };
+      }
+      return { offers: newOffers };
+    }),
 
   updateOfferStatus: (tradeId, status) =>
     set((s) => ({

@@ -4,7 +4,23 @@
   background: var(--bg-card);
   border: 1px solid var(--border-light);
   font-size: 13px;
-  transition: opacity 0.2s;
+  transition: opacity 0.2s, border-color 0.2s;
+}
+
+/* Color-coded offers */
+.trade-offer-card.offer-mine {
+  border-left: 3px solid var(--green-accent);
+  background: rgba(95, 163, 59, 0.05);
+}
+
+.trade-offer-card.offer-incoming {
+  border-left: 3px solid var(--blue-accent);
+  background: rgba(74, 143, 196, 0.05);
+}
+
+.trade-offer-card.offer-completed {
+  border-left: 3px solid var(--text-muted);
+  background: rgba(109, 93, 77, 0.05);
 }
 
 .trade-offer-card.accepted {
@@ -132,3 +148,55 @@
 .offer-status.rejected { color: var(--red-accent); }
 .offer-status.withdrawn,
 .offer-status.expired { color: var(--text-muted); }
+
+/* Trade timer */
+.offer-timer {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: rgba(0, 0, 0, 0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+}
+
+.offer-timer.urgent {
+  color: var(--red-accent);
+  background: rgba(196, 75, 63, 0.15);
+  animation: timerPulse 1s infinite;
+}
+
+@keyframes timerPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Give/Want side labels */
+.give-side .side-label {
+  color: var(--green-light);
+}
+
+.want-side .side-label {
+  color: var(--orange-accent);
+}
+
+/* Free-for-all donation flash */
+.trade-offer-card.offer-incoming .offer-arrow {
+  animation: none;
+}
+
+.offer-header .offer-arrow:has(+ .offer-to:empty) {
+  color: var(--gold-light);
+  font-weight: 700;
+}
+
+/* Donation grab animation */
+@keyframes donationFlash {
+  0%, 100% { background: rgba(74, 143, 196, 0.05); }
+  50% { background: rgba(212, 168, 50, 0.12); }
+}
+
+.trade-offer-card.offer-incoming.pending {
+  animation: donationFlash 2s ease-in-out 3;
+}

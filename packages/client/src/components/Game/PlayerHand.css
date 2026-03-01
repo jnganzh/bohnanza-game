@@ -40,3 +40,17 @@
   background: rgba(212, 168, 50, 0.15);
   border-radius: 2px;
 }
+
+@media (max-width: 768px) {
+  .hand-cards {
+    gap: 4px;
+  }
+
+  .hand-label {
+    font-size: 11px;
+  }
+
+  .hand-hint {
+    font-size: 10px;
+  }
+}

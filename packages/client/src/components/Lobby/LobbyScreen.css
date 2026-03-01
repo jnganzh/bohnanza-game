@@ -489,3 +489,44 @@
   margin-top: 12px;
   font-weight: 600;
 }
+
+@media (max-width: 768px) {
+  .game-title {
+    font-size: 42px;
+  }
+
+  .game-subtitle {
+    font-size: 16px;
+  }
+
+  .bean-char {
+    font-size: 32px;
+  }
+
+  .landing-form {
+    width: 90%;
+  }
+
+  .lobby {
+    padding: 20px 12px;
+  }
+
+  .lobby-title {
+    font-size: 32px;
+  }
+
+  .scoreboard {
+    min-width: auto;
+    width: 90%;
+    padding: 16px 12px;
+  }
+
+  .scoreboard th, .scoreboard td {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  .game-over h1 {
+    font-size: 32px;
+  }
+}
