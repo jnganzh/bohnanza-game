@@ -18,9 +18,9 @@ export const socket: TypedSocket = io(SERVER_URL, {
 });
 
 // ---- Persistent player token ----
-// Use sessionStorage so each browser tab gets its own identity.
+// Use localStorage so the token persists across page refreshes and tab closes.
 // This allows multiple players on the same machine (different tabs).
-// A single tab still reconnects correctly on refresh within the same session.
+// Each player should use a different browser/incognito window for separate identities.
 const TOKEN_KEY = 'bohnanza_player_token';
 
 function generateToken(): string {
@@ -28,10 +28,10 @@ function generateToken(): string {
 }
 
 export function getPlayerToken(): string {
-  let token = sessionStorage.getItem(TOKEN_KEY);
+  let token = localStorage.getItem(TOKEN_KEY);
   if (!token) {
     token = generateToken();
-    sessionStorage.setItem(TOKEN_KEY, token);
+    localStorage.setItem(TOKEN_KEY, token);
   }
   return token;
 }
