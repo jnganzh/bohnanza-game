@@ -17,6 +17,32 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
+.card-total-count {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  background: rgba(0, 0, 0, 0.45);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 8px;
+  font-weight: 700;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.small .card-total-count {
+  top: 2px;
+  right: 2px;
+  font-size: 7px;
+  width: 13px;
+  height: 13px;
+}
+
 .bean-card.small {
   width: 64px;
   height: 88px;

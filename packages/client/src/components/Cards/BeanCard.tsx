@@ -22,6 +22,7 @@ export function BeanCard({ card, selected, highlighted, onClick, small }: Props)
       } as React.CSSProperties}
       onClick={onClick}
     >
+      <span className="card-total-count">{variety.totalCards}</span>
       <div className="card-name">{variety.displayName}</div>
       <div className="card-emoji">{variety.emoji}</div>
       <div className="card-meter">
