@@ -131,6 +131,9 @@ export function registerHandlers(io: Server, socket: TypedSocket): void {
     record.roomId = result.id;
     socket.join(result.id);
 
+    // Tell the joining player which room they joined (so client sets roomId)
+    socket.emit('lobby:room-created', { roomId: result.id });
+
     io.to(result.id).emit('lobby:room-updated', {
       players: result.players.map((p) => ({ id: p.id, name: p.name })),
       maxPlayers: result.maxPlayers,
