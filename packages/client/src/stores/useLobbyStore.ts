@@ -30,7 +30,7 @@ interface LobbyStore {
 }
 
 export const useLobbyStore = create<LobbyStore>((set) => ({
-  playerName: '',
+  playerName: localStorage.getItem('bohnanza_player_name') || '',
   roomId: null,
   rooms: [],
   roomPlayers: [],
@@ -38,7 +38,10 @@ export const useLobbyStore = create<LobbyStore>((set) => ({
   hostId: null,
   error: null,
 
-  setPlayerName: (name) => set({ playerName: name }),
+  setPlayerName: (name) => {
+    localStorage.setItem('bohnanza_player_name', name);
+    set({ playerName: name });
+  },
   setRoomId: (id) => set({ roomId: id }),
   setRooms: (rooms) => set({ rooms }),
   setRoomPlayers: (players, maxPlayers, hostId) =>
