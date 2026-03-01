@@ -111,6 +111,16 @@
   border: 1px solid var(--border-light);
 }
 
+.offer-warning {
+  font-size: 11px;
+  color: var(--red-accent);
+  font-style: italic;
+  margin-bottom: 4px;
+  padding: 3px 6px;
+  background: rgba(196, 75, 63, 0.08);
+  border-radius: 4px;
+}
+
 .offer-status {
   font-size: 11px;
   font-style: italic;

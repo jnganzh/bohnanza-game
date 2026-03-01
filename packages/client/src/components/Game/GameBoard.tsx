@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { useGameStore } from '../../stores/useGameStore.js';
 import { GamePhase, BEAN_VARIETIES } from '@bohnanza/shared';
 import { PlayerHand } from './PlayerHand.js';
@@ -14,6 +15,34 @@ import './GameBoard.css';
 export function GameBoard() {
   const { gameState, isMyTurn, gameOver, finalScores, winnerId, actionError } =
     useGameStore();
+
+  const prevIsMyTurn = useRef(false);
+
+  // Update page title and notify when turn changes
+  useEffect(() => {
+    if (isMyTurn) {
+      document.title = '🌱 YOUR TURN - Bohnanza';
+    } else {
+      document.title = 'Bohnanza';
+    }
+
+    // If turn just became mine (was not mine before), flash the title
+    if (isMyTurn && !prevIsMyTurn.current) {
+      let count = 0;
+      const interval = setInterval(() => {
+        document.title = count % 2 === 0 ? '⭐ YOUR TURN! ⭐' : '🌱 YOUR TURN - Bohnanza';
+        count++;
+        if (count >= 6) {
+          clearInterval(interval);
+          document.title = '🌱 YOUR TURN - Bohnanza';
+        }
+      }, 500);
+
+      return () => clearInterval(interval);
+    }
+
+    prevIsMyTurn.current = isMyTurn;
+  }, [isMyTurn]);
 
   if (!gameState) return null;
 

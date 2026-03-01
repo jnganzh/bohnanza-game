@@ -1,5 +1,5 @@
-import type { TradeOffer } from '@bohnanza/shared';
-import { TradeOfferStatus, TradeOfferType } from '@bohnanza/shared';
+import type { TradeOffer, BeanType, BeanCard as BeanCardType } from '@bohnanza/shared';
+import { TradeOfferStatus, TradeOfferType, BEAN_VARIETIES } from '@bohnanza/shared';
 import { socket } from '../../socket/socketClient.js';
 import './TradeOfferCard.css';
 
@@ -7,9 +7,33 @@ interface Props {
   offer: TradeOffer;
   myId: string;
   players: { id: string; name: string }[];
+  myHand: BeanCardType[];
 }
 
-export function TradeOfferCard({ offer, myId, players }: Props) {
+function BeanTag({ beanType, className }: { beanType: BeanType; className?: string }) {
+  const variety = BEAN_VARIETIES[beanType];
+  if (!variety) {
+    return <span className={`offer-card-tag ${className || ''}`}>{beanType}</span>;
+  }
+  return (
+    <span className={`offer-card-tag ${className || ''}`}>
+      {variety.emoji} {variety.displayName}
+    </span>
+  );
+}
+
+function canFulfillRequest(hand: BeanCardType[], requestedTypes: BeanType[]): boolean {
+  // Check if the hand contains enough of each requested type
+  const handCopy = hand.map((c) => c.type);
+  for (const beanType of requestedTypes) {
+    const idx = handCopy.indexOf(beanType);
+    if (idx === -1) return false;
+    handCopy.splice(idx, 1);
+  }
+  return true;
+}
+
+export function TradeOfferCard({ offer, myId, players, myHand }: Props) {
   const fromName =
     players.find((p) => p.id === offer.fromPlayerId)?.name || '?';
   const toName = offer.toPlayerId
@@ -17,14 +41,20 @@ export function TradeOfferCard({ offer, myId, players }: Props) {
     : 'anyone';
 
   const isPending = offer.status === TradeOfferStatus.Pending;
+  const isTargetedAtMe =
+    offer.toPlayerId === null || offer.toPlayerId === myId;
+  const isNotFromMe = offer.fromPlayerId !== myId;
+
+  // Check if I can fulfill the trade's requested beans
+  const iCanFulfill =
+    offer.type === TradeOfferType.Donation ||
+    offer.requesting.fromHand.length === 0 ||
+    canFulfillRequest(myHand, offer.requesting.fromHand);
+
   const canAccept =
-    isPending &&
-    offer.fromPlayerId !== myId &&
-    (offer.toPlayerId === null || offer.toPlayerId === myId);
+    isPending && isNotFromMe && isTargetedAtMe && iCanFulfill;
   const canReject =
-    isPending &&
-    offer.fromPlayerId !== myId &&
-    (offer.toPlayerId === null || offer.toPlayerId === myId);
+    isPending && isNotFromMe && isTargetedAtMe;
   const canWithdraw = isPending && offer.fromPlayerId === myId;
 
   const statusLabel: Record<string, string> = {
@@ -34,6 +64,14 @@ export function TradeOfferCard({ offer, myId, players }: Props) {
     withdrawn: 'Withdrawn',
     expired: 'Expired',
   };
+
+  // Show a warning if trade requests beans I don't have
+  const showMissingWarning =
+    isPending &&
+    isNotFromMe &&
+    isTargetedAtMe &&
+    !iCanFulfill &&
+    offer.type === TradeOfferType.Trade;
 
   return (
     <div className={`trade-offer-card ${offer.status}`}>
@@ -49,9 +87,7 @@ export function TradeOfferCard({ offer, myId, players }: Props) {
         <div className="offer-side">
           <span className="side-label">Offers:</span>
           {offer.offering.fromHand.map((t, i) => (
-            <span key={`h${i}`} className="offer-card-tag">
-              {t}
-            </span>
+            <BeanTag key={`h${i}`} beanType={t} />
           ))}
           {offer.offering.fromFaceUp.length > 0 && (
             <span className="offer-card-tag face-up">
@@ -64,13 +100,17 @@ export function TradeOfferCard({ offer, myId, players }: Props) {
             <div className="offer-side">
               <span className="side-label">Wants:</span>
               {offer.requesting.fromHand.map((t, i) => (
-                <span key={`r${i}`} className="offer-card-tag want">
-                  {t}
-                </span>
+                <BeanTag key={`r${i}`} beanType={t} className="want" />
               ))}
             </div>
           )}
       </div>
+
+      {showMissingWarning && (
+        <div className="offer-warning">
+          You don't have the requested beans
+        </div>
+      )}
 
       {isPending && (canAccept || canReject || canWithdraw) && (
         <div className="offer-actions">

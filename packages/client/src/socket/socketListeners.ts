@@ -21,6 +21,10 @@ export function registerSocketListeners(): void {
     lobbyStore.getState().setRooms(data.rooms);
   });
 
+  socket.on('lobby:room-deleted', () => {
+    lobbyStore.getState().reset();
+  });
+
   socket.on('lobby:error', (data) => {
     lobbyStore.getState().setError(data.message);
   });

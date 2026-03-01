@@ -445,11 +445,38 @@
   50% { opacity: 1; }
 }
 
+.room-settings {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
 .room-actions {
   display: flex;
   gap: 12px;
   justify-content: center;
+  flex-wrap: wrap;
   margin-bottom: 16px;
+}
+
+.btn-secondary {
+  padding: 12px 28px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-card);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
 .hint {

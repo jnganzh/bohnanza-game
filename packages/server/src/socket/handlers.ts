@@ -86,6 +86,53 @@ export function registerHandlers(io: Server, socket: TypedSocket): void {
     io.emit('lobby:room-list', { rooms: roomManager.getRoomList() });
   });
 
+  socket.on('lobby:delete-room', () => {
+    const sd = getSocketData(socket);
+    if (!sd.roomId) return;
+
+    const roomId = sd.roomId;
+    const room = roomManager.getRoom(roomId);
+    if (!room) return;
+
+    // Get all player socket ids before deleting
+    const playerSocketIds = room.players.map((p) => p.socketId);
+
+    const error = roomManager.deleteRoom(roomId, playerId);
+    if (error) {
+      socket.emit('lobby:error', { message: error });
+      return;
+    }
+
+    // Notify all players in the room that it was deleted, and make them leave the socket room
+    io.to(roomId).emit('lobby:room-deleted', { roomId });
+    // Force all sockets to leave the room
+    for (const sid of playerSocketIds) {
+      const sdata = socketData.get(sid);
+      if (sdata) sdata.roomId = null;
+      io.sockets.sockets.get(sid)?.leave(roomId);
+    }
+
+    io.emit('lobby:room-list', { rooms: roomManager.getRoomList() });
+  });
+
+  socket.on('lobby:change-max-players', (data) => {
+    const sd = getSocketData(socket);
+    if (!sd.roomId) return;
+
+    const result = roomManager.updateMaxPlayers(sd.roomId, playerId, data.maxPlayers);
+    if (typeof result === 'string') {
+      socket.emit('lobby:error', { message: result });
+      return;
+    }
+
+    io.to(result.id).emit('lobby:room-updated', {
+      players: result.players.map((p) => ({ id: p.id, name: p.name })),
+      maxPlayers: result.maxPlayers,
+      hostId: result.hostPlayerId,
+    });
+    io.emit('lobby:room-list', { rooms: roomManager.getRoomList() });
+  });
+
   socket.on('lobby:start-game', () => {
     const sd = getSocketData(socket);
     if (!sd.roomId) return;

@@ -6,6 +6,8 @@ export interface ClientToServerEvents {
   'lobby:create-room': (data: { playerName: string; maxPlayers: number }) => void;
   'lobby:join-room': (data: { roomId: string; playerName: string }) => void;
   'lobby:leave-room': () => void;
+  'lobby:delete-room': () => void;
+  'lobby:change-max-players': (data: { maxPlayers: number }) => void;
   'lobby:start-game': () => void;
 
   'game:plant-bean': (data: { fieldIndex: number }) => void;
@@ -45,6 +47,7 @@ export interface ServerToClientEvents {
   'lobby:room-list': (data: {
     rooms: { id: string; playerCount: number; maxPlayers: number; hostName: string }[];
   }) => void;
+  'lobby:room-deleted': (data: { roomId: string }) => void;
   'lobby:error': (data: { message: string }) => void;
 
   'game:started': (data: { state: ClientGameState }) => void;

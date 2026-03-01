@@ -3,9 +3,46 @@
   border-top: 1px solid var(--border-light);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
+/* Trade/Donate toggle */
+.trade-type-toggle {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-primary);
+  border-radius: 8px;
+  padding: 3px;
+  border: 1px solid var(--border-light);
+}
+
+.toggle-btn {
+  flex: 1;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.toggle-btn.active {
+  background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%);
+  color: white;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.toggle-btn:not(.active):hover {
+  color: var(--text-primary);
+  background: rgba(212, 168, 50, 0.08);
+}
+
+/* Form sections */
 .form-section {
   display: flex;
   flex-direction: column;
@@ -13,16 +50,17 @@
 }
 
 .form-section label {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-secondary);
   display: flex;
   align-items: center;
   gap: 6px;
-  font-weight: 600;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.form-section select,
-.form-section input[type='text'] {
+.form-section select {
   padding: 7px 10px;
   border-radius: 6px;
   border: 1px solid var(--border-light);
@@ -33,17 +71,165 @@
   transition: border-color 0.2s;
 }
 
-.form-section select:focus,
-.form-section input[type='text']:focus {
+.form-section select:focus {
   outline: none;
   border-color: var(--gold-dark);
 }
 
-.form-section small {
+.hint-text {
   color: var(--text-muted);
   font-size: 11px;
+  font-style: italic;
 }
 
+/* Selected beans display */
+.selected-beans-display {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.bean-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.bean-tag.offer {
+  background: rgba(74, 143, 196, 0.15);
+  color: var(--blue-accent);
+  border: 1px solid rgba(74, 143, 196, 0.25);
+}
+
+.bean-tag.want {
+  background: rgba(212, 136, 50, 0.15);
+  color: var(--orange-accent);
+  border: 1px solid rgba(212, 136, 50, 0.25);
+}
+
+/* Bean Picker */
+.bean-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 2px 0;
+}
+
+.bean-picker::-webkit-scrollbar {
+  width: 4px;
+}
+
+.bean-picker::-webkit-scrollbar-track {
+  background: rgba(212, 168, 50, 0.05);
+  border-radius: 2px;
+}
+
+.bean-picker::-webkit-scrollbar-thumb {
+  background: rgba(212, 168, 50, 0.15);
+  border-radius: 2px;
+}
+
+.bean-pick-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--bg-primary);
+  border: 1px solid transparent;
+  transition: all 0.15s;
+}
+
+.bean-pick-item.active {
+  border-color: rgba(212, 136, 50, 0.4);
+  background: rgba(212, 136, 50, 0.06);
+}
+
+.bean-pick-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bean-pick-emoji {
+  font-size: 14px;
+}
+
+.bean-pick-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.bean-pick-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pick-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  padding: 0;
+  line-height: 1;
+}
+
+.pick-btn:hover:not(:disabled) {
+  background: var(--bg-card);
+  border-color: var(--gold-dark);
+}
+
+.pick-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.pick-btn.plus:hover:not(:disabled) {
+  background: rgba(95, 163, 59, 0.15);
+  border-color: rgba(95, 163, 59, 0.4);
+  color: var(--green-light);
+}
+
+.pick-btn.minus:hover:not(:disabled) {
+  background: rgba(196, 75, 63, 0.15);
+  border-color: rgba(196, 75, 63, 0.4);
+  color: var(--red-accent);
+}
+
+.pick-count {
+  font-size: 12px;
+  font-weight: 700;
+  width: 18px;
+  text-align: center;
+  color: var(--text-primary);
+}
+
+/* Wanted summary */
+.wanted-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+/* Propose button */
 .propose-btn {
   padding: 9px 16px;
   border-radius: 8px;

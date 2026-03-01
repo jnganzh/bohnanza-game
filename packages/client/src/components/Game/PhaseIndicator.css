@@ -1,17 +1,68 @@
 .phase-indicator {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 16px;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
   background: var(--bg-secondary);
   border-radius: 10px;
   border: 1px solid var(--border-light);
   transition: all 0.3s;
+  overflow: hidden;
 }
 
 .phase-indicator.my-turn {
-  border-color: rgba(95, 163, 59, 0.35);
-  box-shadow: 0 0 12px rgba(95, 163, 59, 0.08);
+  border-color: rgba(95, 163, 59, 0.5);
+  box-shadow:
+    0 0 16px rgba(95, 163, 59, 0.15),
+    0 0 40px rgba(95, 163, 59, 0.05);
+}
+
+/* YOUR TURN banner */
+.your-turn-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: linear-gradient(90deg, #2d5a1a 0%, #3d7524 30%, #4d8a2e 50%, #3d7524 70%, #2d5a1a 100%);
+  border-bottom: 1px solid rgba(95, 163, 59, 0.3);
+  animation: bannerGlow 2s ease-in-out infinite;
+}
+
+@keyframes bannerGlow {
+  0%, 100% {
+    background: linear-gradient(90deg, #2d5a1a 0%, #3d7524 30%, #4d8a2e 50%, #3d7524 70%, #2d5a1a 100%);
+  }
+  50% {
+    background: linear-gradient(90deg, #345f20 0%, #4a8a2e 30%, #5fa33b 50%, #4a8a2e 70%, #345f20 100%);
+  }
+}
+
+.your-turn-text {
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #7cc459;
+  letter-spacing: 3px;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+.your-turn-icon {
+  font-size: 14px;
+  animation: starPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes starPulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Phase details row */
+.phase-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
 }
 
 .phase-left {
@@ -30,25 +81,31 @@
   color: var(--text-secondary);
 }
 
+.my-turn .phase-badge {
+  border-color: rgba(95, 163, 59, 0.25);
+  color: var(--green-light);
+}
+
 .phase-right {
   display: flex;
   align-items: center;
 }
 
-.phase-turn {
-  font-family: 'Fredoka', 'Nunito', sans-serif;
-  font-size: 16px;
+.phase-hint {
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  color: var(--green-light);
+  font-weight: 600;
+  font-style: italic;
+}
+
+.phase-turn-info {
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.phase-turn-info strong {
   color: var(--text-secondary);
-}
-
-.phase-turn strong {
-  color: var(--text-primary);
-}
-
-.my-turn .phase-turn {
-  color: var(--green-light);
-}
-
-.my-turn .phase-turn strong {
-  color: var(--green-light);
 }

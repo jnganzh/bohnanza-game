@@ -26,6 +26,13 @@ export function LobbyScreen() {
     }
   }, []);
 
+  // Sync joined state — if roomId becomes null externally (e.g. room deleted), reset joined
+  useEffect(() => {
+    if (!roomId && joined) {
+      setJoined(false);
+    }
+  }, [roomId, joined]);
+
   const handleSetName = () => {
     if (nameInput.trim()) {
       setPlayerName(nameInput.trim());
@@ -51,9 +58,23 @@ export function LobbyScreen() {
     useLobbyStore.getState().reset();
   };
 
+  const handleDeleteRoom = () => {
+    socket.emit('lobby:delete-room');
+    setJoined(false);
+    useLobbyStore.getState().reset();
+  };
+
+  const handleChangeMaxPlayers = (newMax: number) => {
+    socket.emit('lobby:change-max-players', { maxPlayers: newMax });
+  };
+
   const handleStartGame = () => {
     socket.emit('lobby:start-game');
   };
+
+  // Determine if current player is the host
+  const myPlayer = roomPlayers.find((p) => p.name === playerName);
+  const isHost = myPlayer ? myPlayer.id === hostId : false;
 
   // Landing / Name entry
   if (!playerName) {
@@ -105,6 +126,26 @@ export function LobbyScreen() {
         <h1 className="lobby-title">Bohnanza</h1>
         <div className="room-lobby">
           <h2 className="room-name">Room: {roomId.slice(0, 6)}</h2>
+
+          {isHost && (
+            <div className="room-settings">
+              <label className="form-label">
+                Room Size:
+                <select
+                  className="form-select"
+                  value={maxPlayers}
+                  onChange={(e) => handleChangeMaxPlayers(Number(e.target.value))}
+                >
+                  {[2, 3, 4, 5].map((n) => (
+                    <option key={n} value={n} disabled={n < roomPlayers.length}>
+                      {n} Players
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          )}
+
           <div className="player-slots">
             {Array.from({ length: maxPlayers }).map((_, i) => (
               <div
@@ -131,16 +172,23 @@ export function LobbyScreen() {
             ))}
           </div>
           <div className="room-actions">
-            <button
-              onClick={handleStartGame}
-              disabled={roomPlayers.length < 2}
-              className="btn-primary btn-large"
-            >
-              Start Game ({roomPlayers.length}/{maxPlayers})
-            </button>
-            <button onClick={handleLeaveRoom} className="btn-danger">
+            {isHost && (
+              <button
+                onClick={handleStartGame}
+                disabled={roomPlayers.length < 2}
+                className="btn-primary btn-large"
+              >
+                Start Game ({roomPlayers.length}/{maxPlayers})
+              </button>
+            )}
+            <button onClick={handleLeaveRoom} className="btn-secondary">
               Leave Room
             </button>
+            {isHost && (
+              <button onClick={handleDeleteRoom} className="btn-danger">
+                Delete Room
+              </button>
+            )}
           </div>
           {roomPlayers.length < 2 && (
             <p className="hint">Need at least 2 players to start</p>

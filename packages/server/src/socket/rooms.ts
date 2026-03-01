@@ -51,6 +51,26 @@ class RoomManager {
     return room;
   }
 
+  deleteRoom(roomId: string, playerId: string): string | null {
+    const room = this.rooms.get(roomId);
+    if (!room) return 'Room not found';
+    if (room.hostPlayerId !== playerId) return 'Only the host can delete the room';
+    if (room.status !== 'waiting') return 'Cannot delete a room with a game in progress';
+    this.rooms.delete(roomId);
+    return null; // success
+  }
+
+  updateMaxPlayers(roomId: string, playerId: string, maxPlayers: number): Room | string {
+    const room = this.rooms.get(roomId);
+    if (!room) return 'Room not found';
+    if (room.hostPlayerId !== playerId) return 'Only the host can change room size';
+    if (room.status !== 'waiting') return 'Cannot change size during a game';
+    const clamped = Math.min(5, Math.max(2, maxPlayers));
+    if (clamped < room.players.length) return 'Cannot set max players below current player count';
+    room.maxPlayers = clamped;
+    return room;
+  }
+
   getRoom(roomId: string): Room | undefined {
     return this.rooms.get(roomId);
   }

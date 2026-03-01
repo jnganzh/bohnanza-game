@@ -4,6 +4,7 @@ import {
   TradeManager,
   GamePhase,
   isGameError,
+  BeanType as BeanTypeEnum,
 } from '@bohnanza/shared';
 import type {
   GameState,
@@ -13,6 +14,8 @@ import type {
   TradeOffer,
 } from '@bohnanza/shared';
 import { TradeOfferStatus, TradeOfferType } from '@bohnanza/shared';
+
+const VALID_BEAN_TYPES = new Set<string>(Object.values(BeanTypeEnum));
 import { filterForPlayer } from './stateSync.js';
 import { nanoid } from 'nanoid';
 
@@ -101,6 +104,18 @@ export class GameSession {
       requesting: { fromHand: BeanType[] };
     }
   ): void {
+    // Validate that all bean types are valid enum values
+    const allBeanTypes = [
+      ...data.offering.fromHand,
+      ...data.requesting.fromHand,
+    ];
+    for (const bt of allBeanTypes) {
+      if (!VALID_BEAN_TYPES.has(bt)) {
+        this.emitError(playerId, 'INVALID_BEAN_TYPE', `Invalid bean type: ${bt}`);
+        return;
+      }
+    }
+
     const offer: TradeOffer = {
       id: nanoid(8),
       type: TradeOfferType.Trade,
