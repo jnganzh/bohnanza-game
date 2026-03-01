@@ -29,6 +29,7 @@ export function registerHandlers(io: Server, socket: TypedSocket): void {
 
   socket.on('lobby:reconnect', (data) => {
     const { token, playerName } = data;
+    console.log(`[reconnect] token=${token.slice(0,8)}… name="${playerName}" socketId=${socket.id}`);
 
     const existing = playersByToken.get(token);
     if (existing) {
@@ -104,6 +105,7 @@ export function registerHandlers(io: Server, socket: TypedSocket): void {
     const room = roomManager.createRoom(record.playerId, data.playerName, socket.id, data.maxPlayers);
     record.roomId = room.id;
     socket.join(room.id);
+    console.log(`[create-room] player=${record.playerId} name="${data.playerName}" roomId=${room.id} socketId=${socket.id}`);
 
     socket.emit('lobby:room-created', { roomId: room.id });
     socket.emit('lobby:room-updated', {
@@ -130,6 +132,7 @@ export function registerHandlers(io: Server, socket: TypedSocket): void {
 
     record.roomId = result.id;
     socket.join(result.id);
+    console.log(`[join-room] player=${record.playerId} name="${data.playerName}" roomId=${result.id} socketId=${socket.id}`);
 
     // Tell the joining player which room they joined (so client sets roomId)
     socket.emit('lobby:room-created', { roomId: result.id });
@@ -230,7 +233,13 @@ export function registerHandlers(io: Server, socket: TypedSocket): void {
 
     for (const p of room.players) {
       const clientState = session.getClientState(p.id);
-      io.to(p.socketId).emit('game:started', { state: clientState });
+      console.log(`[start-game] Sending game:started to player ${p.id} (${p.name}) via socketId ${p.socketId}`);
+      const targetSocket = io.sockets.sockets.get(p.socketId);
+      if (targetSocket) {
+        targetSocket.emit('game:started', { state: clientState });
+      } else {
+        console.log(`[start-game] WARNING: No socket found for socketId ${p.socketId}`);
+      }
     }
 
     io.emit('lobby:room-list', { rooms: roomManager.getRoomList() });
