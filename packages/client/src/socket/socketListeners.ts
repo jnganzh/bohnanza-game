@@ -80,6 +80,12 @@ export function registerSocketListeners(): void {
     gameStore.getState().setGameOver(data.finalScores, data.winnerId);
   });
 
+  // Host ended the game — go back to room lobby
+  socket.on('game:ended', (_data) => {
+    gameStore.getState().clearGameState();
+    tradeStore.getState().clearOffers();
+  });
+
   // Trade
   socket.on('trade:new-offer', (data) => {
     tradeStore.getState().addOffer(data.offer);

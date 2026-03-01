@@ -1,5 +1,6 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useGameStore } from '../../stores/useGameStore.js';
+import { useLobbyStore } from '../../stores/useLobbyStore.js';
 import { GamePhase, BEAN_VARIETIES } from '@bohnanza/shared';
 import { PlayerHand } from './PlayerHand.js';
 import { BeanFieldComp } from './BeanField.js';
@@ -15,8 +16,11 @@ import './GameBoard.css';
 export function GameBoard() {
   const { gameState, isMyTurn, gameOver, finalScores, winnerId, actionError } =
     useGameStore();
+  const hostId = useLobbyStore((s) => s.hostId);
 
   const prevIsMyTurn = useRef(false);
+  const [showEndConfirm, setShowEndConfirm] = useState(false);
+  const isHost = gameState?.myId === hostId;
 
   // Update page title and notify when turn changes
   useEffect(() => {
@@ -65,6 +69,38 @@ export function GameBoard() {
         myId={gameState.myId}
       />
 
+      {isHost && (
+        <div className="end-game-area">
+          {!showEndConfirm ? (
+            <button
+              className="btn-end-game"
+              onClick={() => setShowEndConfirm(true)}
+            >
+              End Game
+            </button>
+          ) : (
+            <div className="end-game-confirm">
+              <span>End the game for everyone?</span>
+              <button
+                className="btn-end-game-yes"
+                onClick={() => {
+                  socket.emit('game:end-game');
+                  setShowEndConfirm(false);
+                }}
+              >
+                Yes, End Game
+              </button>
+              <button
+                className="btn-end-game-no"
+                onClick={() => setShowEndConfirm(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
       {actionError && <div className="action-error">{actionError}</div>}
 
       <div className="game-main">
@@ -89,6 +125,7 @@ export function GameBoard() {
               <FaceUpCards
                 cards={gameState.turn.drawnFaceUpCards}
                 isMyTurn={isMyTurn}
+                keptCardIds={gameState.turn.keptFaceUpCardIds}
               />
             )}
             <div className="deck-info">

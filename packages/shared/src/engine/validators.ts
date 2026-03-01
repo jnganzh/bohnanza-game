@@ -83,10 +83,13 @@ export function validateTrade(state: GameState, offer: TradeOffer): string | nul
     handCopy.splice(idx, 1);
   }
 
-  // Verify face-up cards exist
+  // Verify face-up cards exist and are not already kept
   for (const cardId of offer.offering.fromFaceUp) {
     const exists = state.turn.drawnFaceUpCards.some((c) => c.id === cardId);
     if (!exists) return 'Face-up card not found';
+    if (state.turn.keptFaceUpCardIds.includes(cardId)) {
+      return 'Face-up card has already been kept';
+    }
   }
 
   // For trades (not donations), verify the target has the requested cards

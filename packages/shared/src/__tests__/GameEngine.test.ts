@@ -194,7 +194,9 @@ describe('GameEngine', () => {
       const result = assertNotError(
         GameEngine.keepFaceUpCard(state, 'p1', cardToKeep.id)
       );
-      expect(result.turn.drawnFaceUpCards).toHaveLength(1);
+      // Card stays in drawnFaceUpCards but is marked as kept
+      expect(result.turn.drawnFaceUpCards).toHaveLength(2);
+      expect(result.turn.keptFaceUpCardIds).toContain(cardToKeep.id);
       expect(result.players[0].pendingPlanting).toHaveLength(1);
       expect(result.players[0].pendingPlanting[0].id).toBe(cardToKeep.id);
     });

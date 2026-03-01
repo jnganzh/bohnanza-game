@@ -17,6 +17,7 @@ export interface TurnState {
   beansPlantedThisTurn: number;
   mustPlantFirst: boolean;
   drawnFaceUpCards: BeanCard[];
+  keptFaceUpCardIds: string[];
   activeTradeOffers: TradeOffer[];
 }
 

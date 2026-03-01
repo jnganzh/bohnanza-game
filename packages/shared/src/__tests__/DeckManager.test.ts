@@ -15,6 +15,7 @@ function makeMinimalState(overrides: Partial<GameState> = {}): GameState {
       beansPlantedThisTurn: 0,
       mustPlantFirst: true,
       drawnFaceUpCards: [],
+      keptFaceUpCardIds: [],
       activeTradeOffers: [],
     },
     deck: [],

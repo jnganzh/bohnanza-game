@@ -47,3 +47,34 @@
   background: rgba(95, 163, 59, 0.2);
   border-color: rgba(95, 163, 59, 0.6);
 }
+
+/* Kept card styling */
+.face-up-item.kept {
+  opacity: 0.45;
+  pointer-events: none;
+  position: relative;
+}
+
+.face-up-item.kept::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+.kept-badge {
+  font-family: 'Nunito', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--green-light);
+  background: rgba(95, 163, 59, 0.15);
+  border: 1px solid rgba(95, 163, 59, 0.3);
+  padding: 3px 10px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+}

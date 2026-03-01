@@ -34,6 +34,7 @@ export interface ClientToServerEvents {
   'game:plant-pending-bean': (data: { cardId: string; fieldIndex: number }) => void;
 
   'game:buy-third-field': () => void;
+  'game:end-game': () => void;
 
   'chat:message': (data: { text: string }) => void;
 }
@@ -77,6 +78,8 @@ export interface ServerToClientEvents {
     finalScores: { playerId: string; name: string; gold: number; cardsInHand: number }[];
     winnerId: string;
   }) => void;
+
+  'game:ended': (data: { reason: string }) => void;
 
   'chat:message': (data: {
     playerId: string;

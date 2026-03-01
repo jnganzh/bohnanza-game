@@ -225,6 +225,16 @@ export class GameSession {
     this.applyAction(GameEngine.buyThirdField(this.state, playerId), playerId);
   }
 
+  handleForceEndGame(): void {
+    this.state = GameEngine.endGame(this.state);
+    const scores = GameEngine.getFinalScores(this.state);
+    const winner = GameEngine.getWinner(this.state);
+    this.io.to(this.roomId).emit('game:over', {
+      finalScores: scores,
+      winnerId: winner!.playerId,
+    });
+  }
+
   private applyAction(result: GameResult, playerId: string): void {
     if (isGameError(result)) {
       this.emitError(playerId, result.code, result.message);

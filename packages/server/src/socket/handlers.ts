@@ -331,6 +331,31 @@ export function registerHandlers(io: Server, socket: TypedSocket): void {
     session.handleBuyThirdField(record.playerId);
   });
 
+  socket.on('game:end-game', () => {
+    if (!record?.roomId) return;
+
+    // Only the host can end the game
+    const room = roomManager.getRoom(record.roomId);
+    if (!room) return;
+    if (room.hostPlayerId !== record.playerId) {
+      socket.emit('game:action-error', { code: 'NOT_HOST', message: 'Only the host can end the game' });
+      return;
+    }
+
+    const session = gameSessionStore.get(record.roomId);
+    if (!session) return;
+
+    session.handleForceEndGame();
+
+    // Notify everyone the game was ended by host
+    io.to(record.roomId).emit('game:ended', { reason: 'Host ended the game' });
+
+    // Clean up session
+    gameSessionStore.delete(record.roomId);
+    roomManager.setStatus(record.roomId, 'waiting');
+    io.emit('lobby:room-list', { rooms: roomManager.getRoomList() });
+  });
+
   // ---- Chat ----
 
   socket.on('chat:message', (data) => {

@@ -74,6 +74,7 @@ export class GameEngine {
         beansPlantedThisTurn: 0,
         mustPlantFirst: true,
         drawnFaceUpCards: [],
+        keptFaceUpCardIds: [],
         activeTradeOffers: [],
       },
       deck,
@@ -171,6 +172,7 @@ export class GameEngine {
         ...newState.turn,
         phase: GamePhase.DrawAndTrade,
         drawnFaceUpCards: cards,
+        keptFaceUpCardIds: [],
         activeTradeOffers: [],
       },
     };
@@ -189,16 +191,15 @@ export class GameEngine {
       return { code: 'NOT_YOUR_TURN', message: 'Only active player can keep face-up cards' };
     }
 
-    const cardIndex = state.turn.drawnFaceUpCards.findIndex((c) => c.id === cardId);
-    if (cardIndex === -1) {
+    const card = state.turn.drawnFaceUpCards.find((c) => c.id === cardId);
+    if (!card) {
       return { code: 'CARD_NOT_FOUND', message: 'Face-up card not found' };
     }
 
-    const card = state.turn.drawnFaceUpCards[cardIndex];
-    const newFaceUp = [
-      ...state.turn.drawnFaceUpCards.slice(0, cardIndex),
-      ...state.turn.drawnFaceUpCards.slice(cardIndex + 1),
-    ];
+    // Don't allow keeping a card that's already kept
+    if (state.turn.keptFaceUpCardIds.includes(cardId)) {
+      return { code: 'ALREADY_KEPT', message: 'Card already kept' };
+    }
 
     const playerIndex = state.players.findIndex((p) => p.id === playerId);
     const newPlayers = state.players.map((p, i) =>
@@ -210,7 +211,10 @@ export class GameEngine {
     return {
       ...state,
       players: newPlayers,
-      turn: { ...state.turn, drawnFaceUpCards: newFaceUp },
+      turn: {
+        ...state.turn,
+        keptFaceUpCardIds: [...state.turn.keptFaceUpCardIds, cardId],
+      },
     };
   }
 
@@ -223,9 +227,11 @@ export class GameEngine {
       return { code: 'NOT_YOUR_TURN', message: 'Only active player can end trading' };
     }
 
-    // Remaining face-up cards go to active player's pending planting
+    // Remaining (un-kept) face-up cards go to active player's pending planting
     const playerIndex = state.players.findIndex((p) => p.id === playerId);
-    const remainingFaceUp = state.turn.drawnFaceUpCards;
+    const remainingFaceUp = state.turn.drawnFaceUpCards.filter(
+      (c) => !state.turn.keptFaceUpCardIds.includes(c.id)
+    );
 
     const newPlayers = state.players.map((p, i) =>
       i === playerIndex
@@ -350,6 +356,7 @@ export class GameEngine {
         beansPlantedThisTurn: 0,
         mustPlantFirst: true,
         drawnFaceUpCards: [],
+        keptFaceUpCardIds: [],
         activeTradeOffers: [],
       },
     };
