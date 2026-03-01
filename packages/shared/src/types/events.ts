@@ -3,6 +3,7 @@ import type { ClientGameState, GamePhase } from './game.js';
 import type { TradeOffer } from './trade.js';
 
 export interface ClientToServerEvents {
+  'lobby:reconnect': (data: { token: string; playerName: string }) => void;
   'lobby:create-room': (data: { playerName: string; maxPlayers: number }) => void;
   'lobby:join-room': (data: { roomId: string; playerName: string }) => void;
   'lobby:leave-room': () => void;
@@ -38,6 +39,15 @@ export interface ClientToServerEvents {
 }
 
 export interface ServerToClientEvents {
+  'lobby:welcome': (data: { token: string; playerId: string }) => void;
+  'lobby:reconnected': (data: {
+    roomId: string | null;
+    inGame: boolean;
+    state?: ClientGameState;
+    roomPlayers?: { id: string; name: string }[];
+    maxPlayers?: number;
+    hostId?: string;
+  }) => void;
   'lobby:room-created': (data: { roomId: string }) => void;
   'lobby:room-updated': (data: {
     players: { id: string; name: string }[];

@@ -19,6 +19,8 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents>(httpServer, {
         origin: ['http://localhost:5173', 'http://localhost:3000'],
         methods: ['GET', 'POST'],
       },
+  pingInterval: 25000,  // ping every 25s
+  pingTimeout: 120000,  // allow 2 minutes before declaring dead (tolerates brief network drops)
 });
 
 io.on('connection', (socket) => {

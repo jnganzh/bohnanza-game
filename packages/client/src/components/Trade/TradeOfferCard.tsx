@@ -44,6 +44,7 @@ export function TradeOfferCard({ offer, myId, players, myHand }: Props) {
   const isTargetedAtMe =
     offer.toPlayerId === null || offer.toPlayerId === myId;
   const isNotFromMe = offer.fromPlayerId !== myId;
+  const iAlreadyRejected = (offer.rejectedByPlayerIds ?? []).includes(myId);
 
   // Check if I can fulfill the trade's requested beans
   const iCanFulfill =
@@ -52,9 +53,9 @@ export function TradeOfferCard({ offer, myId, players, myHand }: Props) {
     canFulfillRequest(myHand, offer.requesting.fromHand);
 
   const canAccept =
-    isPending && isNotFromMe && isTargetedAtMe && iCanFulfill;
+    isPending && isNotFromMe && isTargetedAtMe && iCanFulfill && !iAlreadyRejected;
   const canReject =
-    isPending && isNotFromMe && isTargetedAtMe;
+    isPending && isNotFromMe && isTargetedAtMe && !iAlreadyRejected;
   const canWithdraw = isPending && offer.fromPlayerId === myId;
 
   const statusLabel: Record<string, string> = {

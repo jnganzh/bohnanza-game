@@ -26,5 +26,7 @@ export interface TradeOffer {
   offering: TradeOfferSide;
   requesting: TradeOfferSide;
   status: TradeOfferStatus;
+  /** Player IDs that have individually rejected this open offer */
+  rejectedByPlayerIds: string[];
   timestamp: number;
 }

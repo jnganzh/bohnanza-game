@@ -9,6 +9,26 @@ const SERVER_URL =
   import.meta.env.VITE_SERVER_URL || '';
 
 export const socket: TypedSocket = io(SERVER_URL, {
-  autoConnect: true,
+  autoConnect: false, // We connect manually after registering listeners
   transports: ['websocket', 'polling'],
+  reconnection: true,
+  reconnectionAttempts: Infinity,
+  reconnectionDelay: 1000,
+  reconnectionDelayMax: 5000,
 });
+
+// ---- Persistent player token ----
+const TOKEN_KEY = 'bohnanza_player_token';
+
+function generateToken(): string {
+  return crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+export function getPlayerToken(): string {
+  let token = localStorage.getItem(TOKEN_KEY);
+  if (!token) {
+    token = generateToken();
+    localStorage.setItem(TOKEN_KEY, token);
+  }
+  return token;
+}

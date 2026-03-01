@@ -17,6 +17,7 @@ import { TradeOfferStatus, TradeOfferType } from '@bohnanza/shared';
 
 const VALID_BEAN_TYPES = new Set<string>(Object.values(BeanTypeEnum));
 import { filterForPlayer } from './stateSync.js';
+import { gameSessionStore } from './GameSessionStore.js';
 import { nanoid } from 'nanoid';
 
 export class GameSession {
@@ -124,11 +125,13 @@ export class GameSession {
       offering: data.offering,
       requesting: { fromHand: data.requesting.fromHand, fromFaceUp: [] },
       status: TradeOfferStatus.Pending,
+      rejectedByPlayerIds: [],
       timestamp: Date.now(),
     };
 
     const result = TradeManager.proposeTrade(this.state, offer);
     if (!isGameError(result)) {
+      gameSessionStore.touch(this.roomId);
       this.state = result;
       this.io.to(this.roomId).emit('trade:new-offer', { offer });
       this.broadcastState();
@@ -152,6 +155,7 @@ export class GameSession {
       offering: data.cards,
       requesting: { fromHand: [], fromFaceUp: [] },
       status: TradeOfferStatus.Pending,
+      rejectedByPlayerIds: [],
       timestamp: Date.now(),
     };
 
@@ -227,6 +231,7 @@ export class GameSession {
       return;
     }
 
+    gameSessionStore.touch(this.roomId);
     const previousPhase = this.state.turn.phase;
     this.state = result;
 

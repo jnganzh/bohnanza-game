@@ -118,9 +118,35 @@ export class TradeManager {
       return { code: 'TRADE_NOT_PENDING', message: 'Trade is no longer pending' };
     }
 
-    const newOffers = state.turn.activeTradeOffers.map((o) =>
-      o.id === tradeId ? { ...o, status: TradeOfferStatus.Rejected } : o
-    );
+    let newOffers: TradeOffer[];
+    if (offer.toPlayerId !== null) {
+      // Targeted trade — full rejection
+      newOffers = state.turn.activeTradeOffers.map((o) =>
+        o.id === tradeId ? { ...o, status: TradeOfferStatus.Rejected } : o
+      );
+    } else {
+      // Open trade — per-player rejection; offer stays pending for others
+      if (offer.rejectedByPlayerIds.includes(rejectingPlayerId)) {
+        return { code: 'ALREADY_REJECTED', message: 'You already rejected this trade' };
+      }
+
+      const newRejected = [...offer.rejectedByPlayerIds, rejectingPlayerId];
+      // If every non-proposer has rejected, mark the whole offer as rejected
+      const otherPlayerIds = state.players
+        .filter((p) => p.id !== offer.fromPlayerId)
+        .map((p) => p.id);
+      const allRejected = otherPlayerIds.every((id) => newRejected.includes(id));
+
+      newOffers = state.turn.activeTradeOffers.map((o) =>
+        o.id === tradeId
+          ? {
+              ...o,
+              rejectedByPlayerIds: newRejected,
+              status: allRejected ? TradeOfferStatus.Rejected : TradeOfferStatus.Pending,
+            }
+          : o
+      );
+    }
 
     return {
       ...state,

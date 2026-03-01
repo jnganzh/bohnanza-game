@@ -13,25 +13,16 @@ export function LobbyScreen() {
     hostId,
     error,
     setPlayerName,
-    setError,
   } = useLobbyStore();
 
   const [nameInput, setNameInput] = useState('');
   const [maxPlayersInput, setMaxPlayersInput] = useState(4);
-  const [joined, setJoined] = useState(false);
 
   useEffect(() => {
     if (!socket.connected) {
       socket.connect();
     }
   }, []);
-
-  // Sync joined state — if roomId becomes null externally (e.g. room deleted), reset joined
-  useEffect(() => {
-    if (!roomId && joined) {
-      setJoined(false);
-    }
-  }, [roomId, joined]);
 
   const handleSetName = () => {
     if (nameInput.trim()) {
@@ -44,23 +35,19 @@ export function LobbyScreen() {
       playerName,
       maxPlayers: maxPlayersInput,
     });
-    setJoined(true);
   };
 
   const handleJoinRoom = (id: string) => {
     socket.emit('lobby:join-room', { roomId: id, playerName });
-    setJoined(true);
   };
 
   const handleLeaveRoom = () => {
     socket.emit('lobby:leave-room');
-    setJoined(false);
     useLobbyStore.getState().reset();
   };
 
   const handleDeleteRoom = () => {
     socket.emit('lobby:delete-room');
-    setJoined(false);
     useLobbyStore.getState().reset();
   };
 
@@ -119,8 +106,8 @@ export function LobbyScreen() {
     );
   }
 
-  // Room lobby
-  if (joined && roomId) {
+  // Room lobby — shown when we have a roomId (from create, join, or reconnect)
+  if (roomId) {
     return (
       <div className="lobby">
         <h1 className="lobby-title">Bohnanza</h1>

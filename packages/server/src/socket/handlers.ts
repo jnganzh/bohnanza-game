@@ -7,34 +7,102 @@ import { nanoid } from 'nanoid';
 
 type TypedSocket = Socket<ClientToServerEvents, ServerToClientEvents>;
 
-interface SocketData {
+// ---- Persistent player identity ----
+// Maps token -> PlayerRecord so players can reconnect after refresh / disconnect
+interface PlayerRecord {
   playerId: string;
   playerName: string;
   roomId: string | null;
+  socketId: string | null;
 }
 
-const socketData = new Map<string, SocketData>();
-
-function getSocketData(socket: TypedSocket): SocketData {
-  return socketData.get(socket.id) || { playerId: '', playerName: '', roomId: null };
-}
+const playersByToken = new Map<string, PlayerRecord>();
+const playersBySocketId = new Map<string, PlayerRecord>();
 
 export function registerHandlers(io: Server, socket: TypedSocket): void {
-  const playerId = nanoid(8);
-  socketData.set(socket.id, { playerId, playerName: '', roomId: null });
+  let record: PlayerRecord | null = null;
 
-  // Send current room list to the newly connected socket
+  // Send current room list immediately
   socket.emit('lobby:room-list', { rooms: roomManager.getRoomList() });
+
+  // ---- Reconnect / Identity ----
+
+  socket.on('lobby:reconnect', (data) => {
+    const { token, playerName } = data;
+
+    const existing = playersByToken.get(token);
+    if (existing) {
+      // Returning player — rebind socket
+      if (existing.socketId && existing.socketId !== socket.id) {
+        playersBySocketId.delete(existing.socketId);
+      }
+      existing.socketId = socket.id;
+      existing.playerName = playerName;
+      record = existing;
+      playersBySocketId.set(socket.id, record);
+
+      // Rejoin socket room if they were in one
+      if (record.roomId) {
+        socket.join(record.roomId);
+
+        const session = gameSessionStore.get(record.roomId);
+        if (session) {
+          // Reconnect into active game
+          session.updateSocketId(record.playerId, socket.id);
+          const clientState = session.getClientState(record.playerId);
+          io.to(record.roomId).emit('player:reconnected', { playerId: record.playerId });
+          session.broadcastState();
+          socket.emit('lobby:reconnected', {
+            roomId: record.roomId,
+            inGame: true,
+            state: clientState,
+          });
+        } else {
+          // Reconnect into waiting room
+          const room = roomManager.getRoom(record.roomId);
+          if (room) {
+            roomManager.updateSocketId(record.roomId, record.playerId, socket.id);
+            socket.emit('lobby:reconnected', {
+              roomId: record.roomId,
+              inGame: false,
+              roomPlayers: room.players.map((p) => ({ id: p.id, name: p.name })),
+              maxPlayers: room.maxPlayers,
+              hostId: room.hostPlayerId,
+            });
+          } else {
+            // Room is gone
+            record.roomId = null;
+            socket.emit('lobby:reconnected', { roomId: null, inGame: false });
+          }
+        }
+      } else {
+        socket.emit('lobby:reconnected', { roomId: null, inGame: false });
+      }
+
+      socket.emit('lobby:welcome', { token, playerId: record.playerId });
+    } else {
+      // Brand new player
+      const playerId = nanoid(8);
+      record = { playerId, playerName, roomId: null, socketId: socket.id };
+      playersByToken.set(token, record);
+      playersBySocketId.set(socket.id, record);
+      socket.emit('lobby:welcome', { token, playerId });
+      socket.emit('lobby:reconnected', { roomId: null, inGame: false });
+    }
+  });
 
   // ---- Lobby ----
 
   socket.on('lobby:create-room', (data) => {
-    const sd = getSocketData(socket);
-    sd.playerName = data.playerName;
-    sd.playerId = playerId;
+    if (!record) return;
+    if (record.roomId) {
+      socket.emit('lobby:error', { message: 'You are already in a room. Leave it first.' });
+      return;
+    }
 
-    const room = roomManager.createRoom(playerId, data.playerName, socket.id, data.maxPlayers);
-    sd.roomId = room.id;
+    record.playerName = data.playerName;
+    const room = roomManager.createRoom(record.playerId, data.playerName, socket.id, data.maxPlayers);
+    record.roomId = room.id;
     socket.join(room.id);
 
     socket.emit('lobby:room-created', { roomId: room.id });
@@ -47,16 +115,20 @@ export function registerHandlers(io: Server, socket: TypedSocket): void {
   });
 
   socket.on('lobby:join-room', (data) => {
-    const sd = getSocketData(socket);
-    sd.playerName = data.playerName;
+    if (!record) return;
+    if (record.roomId) {
+      socket.emit('lobby:error', { message: 'You are already in a room. Leave it first.' });
+      return;
+    }
 
-    const result = roomManager.joinRoom(data.roomId, playerId, data.playerName, socket.id);
+    record.playerName = data.playerName;
+    const result = roomManager.joinRoom(data.roomId, record.playerId, data.playerName, socket.id);
     if (typeof result === 'string') {
       socket.emit('lobby:error', { message: result });
       return;
     }
 
-    sd.roomId = result.id;
+    record.roomId = result.id;
     socket.join(result.id);
 
     io.to(result.id).emit('lobby:room-updated', {
@@ -68,11 +140,18 @@ export function registerHandlers(io: Server, socket: TypedSocket): void {
   });
 
   socket.on('lobby:leave-room', () => {
-    const sd = getSocketData(socket);
-    if (!sd.roomId) return;
+    if (!record || !record.roomId) return;
 
-    const room = roomManager.leaveRoom(sd.roomId, playerId);
-    socket.leave(sd.roomId);
+    // Cannot leave via lobby if game is in progress
+    const session = gameSessionStore.get(record.roomId);
+    if (session) {
+      socket.emit('lobby:error', { message: 'Cannot leave during an active game.' });
+      return;
+    }
+
+    const room = roomManager.leaveRoom(record.roomId, record.playerId);
+    socket.leave(record.roomId);
+    record.roomId = null;
 
     if (room) {
       io.to(room.id).emit('lobby:room-updated', {
@@ -82,33 +161,28 @@ export function registerHandlers(io: Server, socket: TypedSocket): void {
       });
     }
 
-    sd.roomId = null;
     io.emit('lobby:room-list', { rooms: roomManager.getRoomList() });
   });
 
   socket.on('lobby:delete-room', () => {
-    const sd = getSocketData(socket);
-    if (!sd.roomId) return;
+    if (!record || !record.roomId) return;
 
-    const roomId = sd.roomId;
+    const roomId = record.roomId;
     const room = roomManager.getRoom(roomId);
     if (!room) return;
 
-    // Get all player socket ids before deleting
     const playerSocketIds = room.players.map((p) => p.socketId);
 
-    const error = roomManager.deleteRoom(roomId, playerId);
+    const error = roomManager.deleteRoom(roomId, record.playerId);
     if (error) {
       socket.emit('lobby:error', { message: error });
       return;
     }
 
-    // Notify all players in the room that it was deleted, and make them leave the socket room
     io.to(roomId).emit('lobby:room-deleted', { roomId });
-    // Force all sockets to leave the room
     for (const sid of playerSocketIds) {
-      const sdata = socketData.get(sid);
-      if (sdata) sdata.roomId = null;
+      const pr = playersBySocketId.get(sid);
+      if (pr) pr.roomId = null;
       io.sockets.sockets.get(sid)?.leave(roomId);
     }
 
@@ -116,10 +190,9 @@ export function registerHandlers(io: Server, socket: TypedSocket): void {
   });
 
   socket.on('lobby:change-max-players', (data) => {
-    const sd = getSocketData(socket);
-    if (!sd.roomId) return;
+    if (!record || !record.roomId) return;
 
-    const result = roomManager.updateMaxPlayers(sd.roomId, playerId, data.maxPlayers);
+    const result = roomManager.updateMaxPlayers(record.roomId, record.playerId, data.maxPlayers);
     if (typeof result === 'string') {
       socket.emit('lobby:error', { message: result });
       return;
@@ -134,12 +207,11 @@ export function registerHandlers(io: Server, socket: TypedSocket): void {
   });
 
   socket.on('lobby:start-game', () => {
-    const sd = getSocketData(socket);
-    if (!sd.roomId) return;
+    if (!record || !record.roomId) return;
 
-    const room = roomManager.getRoom(sd.roomId);
+    const room = roomManager.getRoom(record.roomId);
     if (!room) return;
-    if (room.hostPlayerId !== playerId) {
+    if (room.hostPlayerId !== record.playerId) {
       socket.emit('lobby:error', { message: 'Only the host can start the game' });
       return;
     }
@@ -148,12 +220,11 @@ export function registerHandlers(io: Server, socket: TypedSocket): void {
       return;
     }
 
-    roomManager.setStatus(sd.roomId, 'in-progress');
+    roomManager.setStatus(record.roomId, 'in-progress');
 
-    const session = new GameSession(io, sd.roomId, room.players);
-    gameSessionStore.set(sd.roomId, session);
+    const session = new GameSession(io, record.roomId, room.players);
+    gameSessionStore.set(record.roomId, session);
 
-    // Send initial state to each player
     for (const p of room.players) {
       const clientState = session.getClientState(p.id);
       io.to(p.socketId).emit('game:started', { state: clientState });
@@ -165,97 +236,96 @@ export function registerHandlers(io: Server, socket: TypedSocket): void {
   // ---- Game Actions ----
 
   socket.on('game:plant-bean', (data) => {
-    const sd = getSocketData(socket);
-    const session = sd.roomId ? gameSessionStore.get(sd.roomId) : undefined;
+    if (!record?.roomId) return;
+    const session = gameSessionStore.get(record.roomId);
     if (!session) return;
-    session.handlePlantBean(playerId, data.fieldIndex);
+    session.handlePlantBean(record.playerId, data.fieldIndex);
   });
 
   socket.on('game:skip-second-plant', () => {
-    const sd = getSocketData(socket);
-    const session = sd.roomId ? gameSessionStore.get(sd.roomId) : undefined;
+    if (!record?.roomId) return;
+    const session = gameSessionStore.get(record.roomId);
     if (!session) return;
-    session.handleSkipSecondPlant(playerId);
+    session.handleSkipSecondPlant(record.playerId);
   });
 
   socket.on('game:harvest-field', (data) => {
-    const sd = getSocketData(socket);
-    const session = sd.roomId ? gameSessionStore.get(sd.roomId) : undefined;
+    if (!record?.roomId) return;
+    const session = gameSessionStore.get(record.roomId);
     if (!session) return;
-    session.handleHarvestField(playerId, data.fieldIndex);
+    session.handleHarvestField(record.playerId, data.fieldIndex);
   });
 
   socket.on('game:keep-face-up-card', (data) => {
-    const sd = getSocketData(socket);
-    const session = sd.roomId ? gameSessionStore.get(sd.roomId) : undefined;
+    if (!record?.roomId) return;
+    const session = gameSessionStore.get(record.roomId);
     if (!session) return;
-    session.handleKeepFaceUpCard(playerId, data.cardId);
+    session.handleKeepFaceUpCard(record.playerId, data.cardId);
   });
 
   socket.on('game:propose-trade', (data) => {
-    const sd = getSocketData(socket);
-    const session = sd.roomId ? gameSessionStore.get(sd.roomId) : undefined;
+    if (!record?.roomId) return;
+    const session = gameSessionStore.get(record.roomId);
     if (!session) return;
-    session.handleProposeTrade(playerId, data);
+    session.handleProposeTrade(record.playerId, data);
   });
 
   socket.on('game:propose-donation', (data) => {
-    const sd = getSocketData(socket);
-    const session = sd.roomId ? gameSessionStore.get(sd.roomId) : undefined;
+    if (!record?.roomId) return;
+    const session = gameSessionStore.get(record.roomId);
     if (!session) return;
-    session.handleProposeDonation(playerId, data);
+    session.handleProposeDonation(record.playerId, data);
   });
 
   socket.on('game:accept-trade', (data) => {
-    const sd = getSocketData(socket);
-    const session = sd.roomId ? gameSessionStore.get(sd.roomId) : undefined;
+    if (!record?.roomId) return;
+    const session = gameSessionStore.get(record.roomId);
     if (!session) return;
-    session.handleAcceptTrade(playerId, data.tradeId);
+    session.handleAcceptTrade(record.playerId, data.tradeId);
   });
 
   socket.on('game:reject-trade', (data) => {
-    const sd = getSocketData(socket);
-    const session = sd.roomId ? gameSessionStore.get(sd.roomId) : undefined;
+    if (!record?.roomId) return;
+    const session = gameSessionStore.get(record.roomId);
     if (!session) return;
-    session.handleRejectTrade(playerId, data.tradeId);
+    session.handleRejectTrade(record.playerId, data.tradeId);
   });
 
   socket.on('game:withdraw-trade', (data) => {
-    const sd = getSocketData(socket);
-    const session = sd.roomId ? gameSessionStore.get(sd.roomId) : undefined;
+    if (!record?.roomId) return;
+    const session = gameSessionStore.get(record.roomId);
     if (!session) return;
-    session.handleWithdrawTrade(playerId, data.tradeId);
+    session.handleWithdrawTrade(record.playerId, data.tradeId);
   });
 
   socket.on('game:end-trading', () => {
-    const sd = getSocketData(socket);
-    const session = sd.roomId ? gameSessionStore.get(sd.roomId) : undefined;
+    if (!record?.roomId) return;
+    const session = gameSessionStore.get(record.roomId);
     if (!session) return;
-    session.handleEndTrading(playerId);
+    session.handleEndTrading(record.playerId);
   });
 
   socket.on('game:plant-pending-bean', (data) => {
-    const sd = getSocketData(socket);
-    const session = sd.roomId ? gameSessionStore.get(sd.roomId) : undefined;
+    if (!record?.roomId) return;
+    const session = gameSessionStore.get(record.roomId);
     if (!session) return;
-    session.handlePlantPendingBean(playerId, data.cardId, data.fieldIndex);
+    session.handlePlantPendingBean(record.playerId, data.cardId, data.fieldIndex);
   });
 
   socket.on('game:buy-third-field', () => {
-    const sd = getSocketData(socket);
-    const session = sd.roomId ? gameSessionStore.get(sd.roomId) : undefined;
+    if (!record?.roomId) return;
+    const session = gameSessionStore.get(record.roomId);
     if (!session) return;
-    session.handleBuyThirdField(playerId);
+    session.handleBuyThirdField(record.playerId);
   });
 
   // ---- Chat ----
 
   socket.on('chat:message', (data) => {
-    const sd = getSocketData(socket);
-    if (!sd.roomId) return;
-    io.to(sd.roomId).emit('chat:message', {
-      playerId,
-      playerName: sd.playerName,
+    if (!record?.roomId) return;
+    io.to(record.roomId).emit('chat:message', {
+      playerId: record.playerId,
+      playerName: record.playerName,
       text: data.text,
       timestamp: Date.now(),
     });
@@ -264,15 +334,18 @@ export function registerHandlers(io: Server, socket: TypedSocket): void {
   // ---- Disconnect ----
 
   socket.on('disconnect', () => {
-    const sd = getSocketData(socket);
-    if (sd.roomId) {
-      const session = gameSessionStore.get(sd.roomId);
+    if (!record) return;
+    if (record.roomId) {
+      const session = gameSessionStore.get(record.roomId);
       if (session) {
-        session.markDisconnected(playerId);
-        io.to(sd.roomId).emit('player:disconnected', { playerId });
+        session.markDisconnected(record.playerId);
+        io.to(record.roomId).emit('player:disconnected', { playerId: record.playerId });
         session.broadcastState();
       }
     }
-    socketData.delete(socket.id);
+    // Keep PlayerRecord in playersByToken for reconnection.
+    // Just unbind the socket.
+    record.socketId = null;
+    playersBySocketId.delete(socket.id);
   });
 }

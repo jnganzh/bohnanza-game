@@ -569,6 +569,7 @@ describe('GameEngine', () => {
           offering: { fromHand: [p1Hand[0].type], fromFaceUp: [] },
           requesting: { fromHand: [state.players[1].hand[0].type], fromFaceUp: [] },
           status: TradeOfferStatus.Pending,
+          rejectedByPlayerIds: [],
           timestamp: Date.now(),
         };
 
@@ -588,6 +589,7 @@ describe('GameEngine', () => {
         offering: { fromHand: [state.players[1].hand[0].type], fromFaceUp: [] },
         requesting: { fromHand: [state.players[2].hand[0].type], fromFaceUp: [] },
         status: TradeOfferStatus.Pending,
+        rejectedByPlayerIds: [],
         timestamp: Date.now(),
       };
 
@@ -607,6 +609,7 @@ describe('GameEngine', () => {
           offering: { fromHand: [], fromFaceUp: [state.turn.drawnFaceUpCards[0].id] },
           requesting: { fromHand: [], fromFaceUp: [] },
           status: TradeOfferStatus.Pending,
+          rejectedByPlayerIds: [],
           timestamp: Date.now(),
         };
 
@@ -629,6 +632,7 @@ describe('GameEngine', () => {
           offering: { fromHand: [p1Hand[0].type], fromFaceUp: [] },
           requesting: { fromHand: [p2Hand[0].type], fromFaceUp: [] },
           status: TradeOfferStatus.Pending,
+          rejectedByPlayerIds: [],
           timestamp: Date.now(),
         };
 
@@ -657,6 +661,7 @@ describe('GameEngine', () => {
           offering: { fromHand: [], fromFaceUp: [faceUp[0].id] },
           requesting: { fromHand: [], fromFaceUp: [] },
           status: TradeOfferStatus.Pending,
+          rejectedByPlayerIds: [],
           timestamp: Date.now(),
         };
 

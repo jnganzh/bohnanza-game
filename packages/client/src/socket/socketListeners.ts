@@ -1,4 +1,4 @@
-import { socket } from './socketClient.js';
+import { socket, getPlayerToken } from './socketClient.js';
 import { useLobbyStore } from '../stores/useLobbyStore.js';
 import { useGameStore } from '../stores/useGameStore.js';
 import { useTradeStore } from '../stores/useTradeStore.js';
@@ -7,6 +7,38 @@ export function registerSocketListeners(): void {
   const lobbyStore = useLobbyStore;
   const gameStore = useGameStore;
   const tradeStore = useTradeStore;
+
+  // On every (re)connect, send the persistent token to identify ourselves
+  socket.on('connect', () => {
+    const token = getPlayerToken();
+    const playerName = lobbyStore.getState().playerName || '';
+    socket.emit('lobby:reconnect', { token, playerName });
+  });
+
+  // Server acknowledges our identity
+  socket.on('lobby:welcome', (_data) => {
+    // Token confirmed; nothing else to do
+  });
+
+  // Server tells us what state we should be in
+  socket.on('lobby:reconnected', (data) => {
+    if (data.inGame && data.state) {
+      // Rejoin active game
+      gameStore.getState().setGameState(data.state);
+      if (data.roomId) {
+        lobbyStore.getState().setRoomId(data.roomId);
+      }
+    } else if (data.roomId && data.roomPlayers) {
+      // Rejoin waiting room
+      lobbyStore.getState().setRoomId(data.roomId);
+      lobbyStore.getState().setRoomPlayers(
+        data.roomPlayers,
+        data.maxPlayers!,
+        data.hostId!,
+      );
+    }
+    // If roomId is null, player is in lobby — no action needed
+  });
 
   // Lobby
   socket.on('lobby:room-created', (data) => {
