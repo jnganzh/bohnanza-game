@@ -1,8 +1,8 @@
 .bean-card {
-  width: 90px;
-  height: 126px;
-  border-radius: 10px;
-  border: 2px solid rgba(255, 255, 255, 0.15);
+  width: 88px;
+  height: 122px;
+  border-radius: 8px;
+  border: 2px solid rgba(107, 79, 45, 0.5);
   background: linear-gradient(165deg, var(--bean-color, #555) 0%, var(--bean-color-dark, #222) 100%);
   display: flex;
   flex-direction: column;
@@ -14,14 +14,14 @@
   transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
   position: relative;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 .bean-card.small {
-  width: 66px;
-  height: 92px;
+  width: 64px;
+  height: 88px;
   padding: 5px 4px 4px;
-  border-radius: 8px;
+  border-radius: 6px;
 }
 
 .bean-card.clickable {
@@ -29,107 +29,88 @@
 }
 
 .bean-card.clickable:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
-  border-color: rgba(255, 255, 255, 0.35);
+  transform: translateY(-6px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 .bean-card.selected {
-  border-color: #FFD700;
-  box-shadow: 0 0 12px rgba(255, 215, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.4);
+  border-color: var(--gold);
+  box-shadow: 0 0 14px rgba(212, 168, 50, 0.5), 0 4px 12px rgba(0, 0, 0, 0.4);
   transform: translateY(-8px);
 }
 
 .bean-card.highlighted {
-  border-color: #00FF88;
-  box-shadow: 0 0 14px rgba(0, 255, 136, 0.35), 0 4px 12px rgba(0, 0, 0, 0.4);
-  animation: pulseGlow 2s infinite;
+  border-color: var(--green-accent);
+  box-shadow: 0 0 14px rgba(95, 163, 59, 0.4), 0 4px 12px rgba(0, 0, 0, 0.4);
+  animation: cardPulse 2s infinite;
 }
 
-@keyframes pulseGlow {
-  0%, 100% { box-shadow: 0 0 10px rgba(0, 255, 136, 0.3), 0 4px 12px rgba(0, 0, 0, 0.4); }
-  50% { box-shadow: 0 0 20px rgba(0, 255, 136, 0.5), 0 4px 12px rgba(0, 0, 0, 0.4); }
+@keyframes cardPulse {
+  0%, 100% { box-shadow: 0 0 10px rgba(95, 163, 59, 0.3); }
+  50% { box-shadow: 0 0 22px rgba(95, 163, 59, 0.5); }
 }
 
-.bean-card-top {
-  width: 100%;
-  text-align: center;
-}
-
-.bean-card-name {
+.card-name {
+  font-family: 'Fredoka', 'Nunito', sans-serif;
   font-weight: 700;
   font-size: 9.5px;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
   letter-spacing: 0.3px;
   text-transform: uppercase;
+  text-align: center;
   line-height: 1.2;
 }
 
-.small .bean-card-name {
+.small .card-name {
   font-size: 7.5px;
 }
 
-.bean-card-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-}
-
-.bean-card-emoji {
-  font-size: 32px;
+.card-emoji {
+  font-size: 30px;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
   line-height: 1;
 }
 
-.small .bean-card-emoji {
-  font-size: 22px;
+.small .card-emoji {
+  font-size: 20px;
 }
 
-.bean-card-meter {
+.card-meter {
   display: flex;
   gap: 3px;
   flex-wrap: wrap;
   justify-content: center;
 }
 
-.bean-card-meter .tier {
-  background: rgba(0, 0, 0, 0.45);
+.card-tier {
+  background: rgba(0, 0, 0, 0.4);
   padding: 1px 4px;
-  border-radius: 4px;
+  border-radius: 3px;
   font-size: 8px;
-  font-weight: 600;
-  backdrop-filter: blur(4px);
-  display: flex;
-  align-items: center;
-  gap: 1px;
+  font-weight: 700;
 }
 
-.small .bean-card-meter .tier {
+.small .card-tier {
   font-size: 7px;
   padding: 1px 3px;
 }
 
-.tier-coin {
-  font-size: 7px;
-}
-
-.small .tier-coin {
-  font-size: 6px;
-}
-
-/* Card back */
+/* Card back - golden deck style */
 .bean-card-back {
-  background: linear-gradient(135deg, #D4A23A 0%, #8B6914 50%, #D4A23A 100%);
-  border-color: #DAA520;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(255, 215, 0, 0.1);
+  background: linear-gradient(135deg, #c49a3c 0%, #8B6914 50%, #c49a3c 100%);
+  border-color: #9a7a1e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
-.coin-icon {
-  font-size: 36px;
+.back-icon {
+  font-size: 32px;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
 }
 
-.small .coin-icon {
-  font-size: 24px;
+.small .back-icon {
+  font-size: 22px;
 }

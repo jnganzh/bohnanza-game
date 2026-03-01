@@ -1,20 +1,23 @@
 .player-hand {
-  margin: 14px 0;
+  margin: 12px 0;
 }
 
 .hand-label {
+  font-family: 'Fredoka', 'Nunito', sans-serif;
   font-size: 13px;
   color: var(--text-secondary);
   margin-bottom: 8px;
   display: flex;
   align-items: center;
   gap: 6px;
+  font-weight: 600;
 }
 
 .hand-hint {
   font-style: italic;
-  color: #666;
+  color: var(--text-muted);
   font-size: 12px;
+  font-family: 'Nunito', sans-serif;
 }
 
 .hand-cards {
@@ -29,11 +32,11 @@
 }
 
 .hand-cards::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(212, 168, 50, 0.05);
   border-radius: 2px;
 }
 
 .hand-cards::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(212, 168, 50, 0.15);
   border-radius: 2px;
 }

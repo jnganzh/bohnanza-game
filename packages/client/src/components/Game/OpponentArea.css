@@ -1,135 +1,122 @@
 .opponent-area {
-  padding: 12px 16px;
-  border-radius: 12px;
-  background: linear-gradient(180deg, rgba(22, 33, 62, 0.95) 0%, rgba(26, 26, 46, 0.9) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  min-width: 200px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .opponent-area.active {
-  border-color: rgba(52, 152, 219, 0.5);
-  box-shadow: 0 0 12px rgba(52, 152, 219, 0.15);
+  border-color: rgba(74, 143, 196, 0.4);
+  box-shadow: 0 0 10px rgba(74, 143, 196, 0.1);
 }
 
 .opponent-area.disconnected {
-  opacity: 0.45;
+  opacity: 0.4;
 }
 
-.opponent-header {
+.opp-left {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-bottom: 10px;
+  gap: 4px;
+  min-width: 90px;
 }
 
-.opponent-name-row {
+.opp-name-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
-.opponent-name {
+.opp-name {
+  font-family: 'Fredoka', 'Nunito', sans-serif;
   font-weight: 700;
-  font-size: 15px;
-  letter-spacing: 0.3px;
-}
-
-.active-badge {
-  background: rgba(52, 152, 219, 0.2);
-  color: #64b5f6;
-  padding: 2px 8px;
-  border-radius: 6px;
-  font-size: 10px;
-  font-weight: 600;
-  border: 1px solid rgba(52, 152, 219, 0.3);
+  font-size: 14px;
 }
 
 .dc-badge {
-  background: rgba(231, 76, 60, 0.2);
-  color: #ef5350;
-  padding: 2px 8px;
-  border-radius: 6px;
-  font-size: 10px;
-  font-weight: 600;
-  border: 1px solid rgba(231, 76, 60, 0.3);
+  background: rgba(196, 75, 63, 0.2);
+  color: var(--red-accent);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 700;
 }
 
-.opponent-stats {
-  display: flex;
-  gap: 12px;
-}
-
-.opp-stat {
-  font-size: 13px;
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-
-.opp-stat.gold {
-  color: #FFD54F;
-}
-
-.opp-stat.pending {
-  color: #ffb74d;
-}
-
-.opponent-fields {
+.opp-stats {
   display: flex;
   gap: 8px;
 }
 
-.opponent-field-card {
+.opp-stat {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.opp-stat.gold {
+  color: var(--gold-light);
+}
+
+.opp-stat.pending {
+  color: var(--orange-accent);
+}
+
+/* Opponent field mini cards matching reference F1/F2 style */
+.opp-fields {
+  display: flex;
+  gap: 8px;
+}
+
+.opp-field {
+  width: 50px;
+  height: 60px;
+  border-radius: 6px;
+  background: var(--soil);
+  border: 1px solid rgba(107, 79, 45, 0.4);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  padding: 6px 10px;
-  background: rgba(255, 255, 255, 0.04);
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  min-width: 60px;
   position: relative;
   overflow: hidden;
 }
 
-/* Top accent bar for planted fields */
-.opponent-field-card:not(.empty-field)::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: var(--opp-field-color, transparent);
+.opp-field.empty-opp-field {
+  opacity: 0.5;
 }
 
-.opponent-field-card.empty-field {
-  opacity: 0.4;
+.opp-field-tag {
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-muted);
+  padding: 2px 0;
+}
+
+.opp-field-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
 }
 
 .opp-field-emoji {
-  font-size: 20px;
+  font-size: 18px;
   line-height: 1;
 }
 
 .opp-field-count {
-  font-size: 14px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--text-primary);
 }
 
-.opp-field-name {
-  font-size: 8px;
-  color: var(--opp-field-color, var(--text-secondary));
-  text-align: center;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-  line-height: 1.1;
-}
-
-.opp-field-empty {
-  font-size: 16px;
-  opacity: 0.5;
+.opp-field-empty-icon {
+  font-size: 14px;
+  opacity: 0.4;
 }

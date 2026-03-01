@@ -51,52 +51,39 @@ export function BeanFieldComp({
 
   return (
     <div
-      className={`bean-field ${isEmpty ? 'empty' : ''} ${canPlant ? 'plantable' : ''}`}
-      style={
-        variety ? ({
-          '--field-color': variety.color,
-          '--field-color-dark': variety.colorDark,
-        } as React.CSSProperties) : undefined
-      }
+      className={`bean-field ${isEmpty ? 'empty' : 'planted'} ${canPlant ? 'plantable' : ''}`}
       onClick={handleClick}
     >
-      <div className="field-header">
-        <span className="field-label">Field {fieldIndex + 1}</span>
-        {!isEmpty && (
-          <span className="field-count">
-            <span className="count-num">{field.cards.length}</span> cards
-          </span>
-        )}
-      </div>
+      <div className="field-label-tag">F{fieldIndex + 1}</div>
 
       {isEmpty ? (
-        <div className="field-empty">
-          <span className="field-empty-icon">🌱</span>
-          <span className="field-empty-text">
+        <div className="field-soil">
+          <div className="soil-sprout">🌱</div>
+          <div className="soil-text">
             {canPlant ? 'Click to plant' : 'Empty'}
-          </span>
+          </div>
         </div>
       ) : (
-        <div className="field-content">
-          <div className="field-bean-emoji">{variety?.emoji}</div>
-          <div className="field-bean-name">{variety?.displayName}</div>
+        <div className="field-planted" style={{ '--bean-color': variety?.color } as React.CSSProperties}>
+          <div className="planted-emoji">{variety?.emoji}</div>
+          <div className="planted-name">{variety?.displayName}</div>
+          <div className="planted-count">{field.cards.length} cards</div>
           <div className="field-beanometer">
             {variety?.beanometer.map((tier, i) => (
               <span
                 key={i}
                 className={`meter-tier ${field.cards.length >= tier.cardCount ? 'reached' : ''}`}
               >
-                {tier.cardCount}:{tier.goldCoins}🪙
+                {tier.cardCount}:{tier.goldCoins}g
               </span>
             ))}
           </div>
+          {isMyField && (
+            <button className="harvest-btn" onClick={handleHarvest}>
+              Harvest
+            </button>
+          )}
         </div>
-      )}
-
-      {isMyField && !isEmpty && (
-        <button className="harvest-btn" onClick={handleHarvest}>
-          Harvest
-        </button>
       )}
 
       {canPlantPending && isEmpty && pendingCards && (
@@ -109,7 +96,7 @@ export function BeanFieldComp({
                 className="plant-pending-btn"
                 onClick={() => handlePlantPending(card.id)}
               >
-                {v.emoji} Plant {v.displayName}
+                {v.emoji} {v.displayName}
               </button>
             );
           })}

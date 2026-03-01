@@ -40,8 +40,9 @@ export function GameBoard() {
 
       <div className="game-main">
         <div className="game-left">
+          {/* Opponents */}
           <div className="opponents-section">
-            <div className="section-label">Opponents</div>
+            <div className="section-label">OPPONENTS</div>
             <div className="opponents-area">
               {gameState.opponents.map((opp) => (
                 <OpponentArea
@@ -53,18 +54,28 @@ export function GameBoard() {
             </div>
           </div>
 
+          {/* Deck + Face-up cards */}
           <div className="center-area">
+            {isTradePhase && gameState.turn.drawnFaceUpCards.length > 0 && (
+              <FaceUpCards
+                cards={gameState.turn.drawnFaceUpCards}
+                isMyTurn={isMyTurn}
+              />
+            )}
             <div className="deck-info">
               <div className="deck-pile">
-                <div className="deck-card">
-                  <span className="deck-icon">🫘</span>
-                  <span className="deck-num">{gameState.deckCount}</span>
+                <div className="deck-stack">
+                  <div className="deck-card-back deck-offset-2"></div>
+                  <div className="deck-card-back deck-offset-1"></div>
+                  <div className="deck-card-back deck-main">
+                    <span className="deck-num">{gameState.deckCount}</span>
+                  </div>
                 </div>
                 <span className="deck-label">
                   Draw Pile
                   {gameState.deckExhaustionCount > 0 && (
                     <span className="reshuffle-badge">
-                      ♻️ {gameState.deckExhaustionCount}/3
+                      {gameState.deckExhaustionCount}/3
                     </span>
                   )}
                 </span>
@@ -76,18 +87,12 @@ export function GameBoard() {
                 <span className="deck-label">Discard</span>
               </div>
             </div>
-
-            {isTradePhase && gameState.turn.drawnFaceUpCards.length > 0 && (
-              <FaceUpCards
-                cards={gameState.turn.drawnFaceUpCards}
-                isMyTurn={isMyTurn}
-              />
-            )}
           </div>
 
+          {/* My fields */}
           <div className="my-area">
             <div className="my-fields-section">
-              <div className="section-label">Your Fields</div>
+              <div className="section-label">YOUR FIELDS</div>
               <div className="my-fields">
                 {gameState.myFields.map((field, i) => (
                   <BeanFieldComp
@@ -102,26 +107,34 @@ export function GameBoard() {
                 ))}
                 {!gameState.myHasThirdField && (
                   <div className="buy-field-slot">
-                    <BuyThirdFieldButton gold={gameState.myGoldCoins} />
+                    <button
+                      className="buy-field-btn"
+                      disabled={gameState.myGoldCoins < 3}
+                      onClick={() => socket.emit('game:buy-third-field')}
+                      title={gameState.myGoldCoins < 3 ? `Need 3 gold (have ${gameState.myGoldCoins})` : 'Buy 3rd field for 3 gold'}
+                    >
+                      <span className="buy-icon">+</span>
+                      <span className="buy-text">Buy Field</span>
+                      <span className="buy-cost">3 gold</span>
+                    </button>
                   </div>
                 )}
                 <div className="gold-counter">
-                  <span className="gold-emoji">🪙</span>
                   <span className="gold-amount">{gameState.myGoldCoins}</span>
-                  <span className="gold-label">Gold</span>
+                  <span className="gold-label">GOLD</span>
                 </div>
               </div>
             </div>
 
             {isPlantPending && gameState.myPendingPlanting.length > 0 && (
               <div className="pending-area">
-                <h4>📦 Must plant these beans:</h4>
+                <h4>Must plant these beans:</h4>
                 <div className="pending-cards">
                   {gameState.myPendingPlanting.map((card) => {
                     const v = BEAN_VARIETIES[card.type];
                     return (
                       <div key={card.id} className="pending-card-info">
-                        <span>{v.emoji}</span> {v.displayName}
+                        {v.emoji} {v.displayName}
                       </div>
                     );
                   })}
@@ -150,20 +163,5 @@ export function GameBoard() {
         </div>
       </div>
     </div>
-  );
-}
-
-function BuyThirdFieldButton({ gold }: { gold: number }) {
-  return (
-    <button
-      className="buy-field-btn"
-      disabled={gold < 3}
-      onClick={() => socket.emit('game:buy-third-field')}
-      title={gold < 3 ? `Need 3 gold (have ${gold})` : 'Buy 3rd field for 3 gold'}
-    >
-      <span className="buy-field-icon">🌾</span>
-      <span>Buy 3rd Field</span>
-      <small>3 🪙</small>
-    </button>
   );
 }

@@ -22,7 +22,6 @@ export function ActionPanel({ gameState, isMyTurn }: Props) {
               <button
                 className="action-btn plant"
                 onClick={() => {
-                  // Auto-find best field: prefer matching bean type, then empty
                   let fieldIdx = gameState.myFields.findIndex(
                     (f) => f.beanType === card.type
                   );
@@ -45,13 +44,11 @@ export function ActionPanel({ gameState, isMyTurn }: Props) {
               className="action-btn skip"
               onClick={() => socket.emit('game:skip-second-plant')}
             >
-              ⏭️ Skip 2nd Plant
+              Skip 2nd Plant
             </button>
           )}
           <span className="action-info">
-            <span className="planted-counter">
-              {beansPlantedThisTurn}/2
-            </span>
+            <span className="planted-counter">{beansPlantedThisTurn}/2</span>
             planted
           </span>
         </>
@@ -62,18 +59,18 @@ export function ActionPanel({ gameState, isMyTurn }: Props) {
           className="action-btn end-trade"
           onClick={() => socket.emit('game:end-trading')}
         >
-          ✅ End Trading
+          End Trading
         </button>
       )}
 
       {phase === GamePhase.PlantTradedBeans && gameState.myPendingPlanting.length > 0 && (
         <span className="action-info">
-          📦 Plant your {gameState.myPendingPlanting.length} pending bean(s) by clicking on a field
+          Plant your {gameState.myPendingPlanting.length} pending bean(s) by clicking on a field
         </span>
       )}
 
       {!isMyTurn && phase !== GamePhase.PlantTradedBeans && (
-        <span className="action-info waiting">⏳ Waiting for other player...</span>
+        <span className="action-info waiting">Waiting for other player...</span>
       )}
     </div>
   );

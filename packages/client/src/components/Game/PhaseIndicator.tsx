@@ -34,12 +34,12 @@ export function PhaseIndicator({
 
   return (
     <div className={`phase-indicator ${isMyTurn ? 'my-turn' : ''}`}>
-      <div className="phase-info">
-        <span className="phase-icon">{info.icon}</span>
-        <span className="phase-name">{info.name}</span>
-        <span className="phase-divider">|</span>
-        <span className="phase-player">
-          {isMyTurn ? '✨ Your turn' : `${activePlayerName}'s turn`}
+      <div className="phase-left">
+        <span className="phase-badge">{info.icon} {info.name}</span>
+      </div>
+      <div className="phase-right">
+        <span className="phase-turn">
+          {info.icon} <strong>{info.name}</strong> · {isMyTurn ? 'Your turn' : `${activePlayerName}'s turn`}
         </span>
       </div>
     </div>

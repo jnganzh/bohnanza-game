@@ -2,18 +2,19 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  padding: 10px 12px;
+  padding: 10px 14px;
   gap: 8px;
+  background: var(--bg-primary);
 }
 
 .action-error {
-  background: rgba(231, 76, 60, 0.15);
-  border: 1px solid rgba(231, 76, 60, 0.4);
-  color: #ef5350;
+  background: rgba(196, 75, 63, 0.15);
+  border: 1px solid rgba(196, 75, 63, 0.4);
+  color: var(--red-accent);
   padding: 10px 16px;
   border-radius: 8px;
   text-align: center;
-  font-weight: 600;
+  font-weight: 700;
   animation: fadeIn 0.3s;
 }
 
@@ -32,28 +33,28 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .game-right {
-  width: 330px;
+  width: 320px;
   flex-shrink: 0;
 }
 
-/* Section labels */
+/* Section labels - matching reference */
 .section-label {
+  font-family: 'Fredoka', 'Nunito', sans-serif;
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 1.2px;
-  color: rgba(255, 255, 255, 0.35);
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
   margin-bottom: 8px;
 }
 
 /* Opponents */
 .opponents-section {
-  padding-bottom: 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 8px;
 }
 
 .opponents-area {
@@ -62,18 +63,19 @@
   flex-wrap: wrap;
 }
 
-/* Center - Deck area */
+/* Center - Deck area (stacked cards like reference) */
 .center-area {
   display: flex;
   gap: 20px;
   align-items: center;
-  justify-content: center;
-  padding: 10px 0;
+  justify-content: flex-end;
+  padding: 8px 0;
 }
 
 .deck-info {
   display: flex;
-  gap: 16px;
+  gap: 18px;
+  align-items: flex-start;
 }
 
 .deck-pile, .discard-pile {
@@ -83,53 +85,76 @@
   gap: 6px;
 }
 
-.deck-card {
-  width: 66px;
-  height: 90px;
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  background: linear-gradient(135deg, #D4A23A 0%, #8B6914 50%, #D4A23A 100%);
-  border: 2px solid #DAA520;
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4), inset 0 0 15px rgba(255, 215, 0, 0.08);
-  color: #fff;
+/* Stacked deck cards */
+.deck-stack {
   position: relative;
+  width: 60px;
+  height: 82px;
 }
 
-.deck-icon {
-  font-size: 22px;
+.deck-card-back {
+  position: absolute;
+  width: 60px;
+  height: 82px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #c49a3c 0%, #8B6914 40%, #a07e2a 100%);
+  border: 2px solid #9a7a1e;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.deck-offset-2 {
+  top: -4px;
+  left: 2px;
+  opacity: 0.5;
+}
+
+.deck-offset-1 {
+  top: -2px;
+  left: 1px;
+  opacity: 0.7;
+}
+
+.deck-main {
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #d4a832 0%, #8B6914 50%, #c49a3c 100%);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
 }
 
 .deck-num {
-  font-size: 18px;
-  font-weight: 800;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .discard-card {
-  width: 66px;
-  height: 90px;
-  border-radius: 10px;
+  width: 60px;
+  height: 82px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(22, 33, 62, 0.8);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  background: var(--bg-card);
+  border: 2px solid var(--border-light);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 .discard-num {
+  font-family: 'Fredoka', 'Nunito', sans-serif;
   font-size: 18px;
   font-weight: 700;
-  color: var(--text-secondary);
+  color: var(--text-muted);
 }
 
 .deck-label {
   font-size: 11px;
-  color: var(--text-secondary);
+  color: var(--text-muted);
+  font-weight: 600;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -138,21 +163,22 @@
 
 .reshuffle-badge {
   font-size: 10px;
-  background: rgba(231, 76, 60, 0.15);
-  color: #ef5350;
+  background: rgba(196, 75, 63, 0.2);
+  color: var(--red-accent);
   padding: 1px 6px;
   border-radius: 4px;
-  border: 1px solid rgba(231, 76, 60, 0.3);
+  border: 1px solid rgba(196, 75, 63, 0.3);
+  font-weight: 700;
 }
 
 /* My area */
 .my-area {
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  padding-top: 14px;
+  border-top: 1px solid var(--border-light);
+  padding-top: 12px;
 }
 
 .my-fields-section {
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .my-fields {
@@ -161,35 +187,36 @@
   align-items: flex-start;
 }
 
-/* Gold counter */
+/* Gold counter - matching reference circle style */
 .gold-counter {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 2px;
-  padding: 12px 18px;
-  background: linear-gradient(135deg, rgba(212, 162, 58, 0.1) 0%, rgba(139, 105, 20, 0.1) 100%);
-  border-radius: 12px;
-  border: 1px solid rgba(218, 165, 32, 0.3);
-  min-width: 70px;
-}
-
-.gold-emoji {
-  font-size: 28px;
+  width: 70px;
+  height: 70px;
+  background: radial-gradient(circle, var(--bg-card) 60%, var(--soil) 100%);
+  border-radius: 50%;
+  border: 2px solid var(--gold-dark);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  align-self: center;
 }
 
 .gold-amount {
-  font-size: 28px;
-  font-weight: 800;
-  color: #FFD54F;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--gold-light);
+  line-height: 1;
 }
 
 .gold-label {
-  font-size: 10px;
-  color: var(--text-secondary);
+  font-size: 8px;
+  color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
+  font-weight: 700;
 }
 
 /* Buy third field */
@@ -199,56 +226,65 @@
 }
 
 .buy-field-btn {
-  padding: 14px 18px;
-  border-radius: 12px;
-  border: 2px dashed rgba(255, 255, 255, 0.1);
+  width: 120px;
+  min-height: 130px;
+  border-radius: 10px;
+  border: 2px dashed var(--border-light);
   background: rgba(255, 255, 255, 0.02);
-  color: var(--text-secondary);
+  color: var(--text-muted);
   cursor: pointer;
+  font-family: 'Nunito', sans-serif;
   font-size: 12px;
   font-weight: 600;
   transition: all 0.2s;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  min-width: 100px;
+  justify-content: center;
+  gap: 6px;
 }
 
-.buy-field-icon {
-  font-size: 22px;
+.buy-icon {
+  font-size: 28px;
+  font-weight: 300;
+  line-height: 1;
+  opacity: 0.4;
+}
+
+.buy-text {
+  font-weight: 700;
+}
+
+.buy-cost {
+  font-size: 11px;
+  opacity: 0.6;
 }
 
 .buy-field-btn:hover:not(:disabled) {
-  border-color: rgba(218, 165, 32, 0.5);
-  color: #FFD54F;
-  background: rgba(218, 165, 32, 0.05);
+  border-color: var(--gold-dark);
+  color: var(--gold);
+  background: rgba(212, 168, 50, 0.05);
 }
 
 .buy-field-btn:disabled {
-  opacity: 0.3;
+  opacity: 0.25;
   cursor: not-allowed;
-}
-
-.buy-field-btn small {
-  font-size: 11px;
-  opacity: 0.7;
 }
 
 /* Pending area */
 .pending-area {
-  background: rgba(230, 126, 34, 0.08);
+  background: rgba(212, 136, 50, 0.08);
   padding: 10px 14px;
   border-radius: 10px;
-  margin-bottom: 14px;
-  border: 1px solid rgba(230, 126, 34, 0.25);
+  margin-bottom: 12px;
+  border: 1px solid rgba(212, 136, 50, 0.2);
 }
 
 .pending-area h4 {
-  color: #ffb74d;
+  color: var(--orange-accent);
   margin-bottom: 8px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .pending-cards {
@@ -258,10 +294,10 @@
 }
 
 .pending-card-info {
-  background: rgba(230, 126, 34, 0.15);
+  background: rgba(212, 136, 50, 0.12);
   padding: 5px 10px;
   border-radius: 6px;
   font-size: 12px;
-  font-weight: 500;
-  border: 1px solid rgba(230, 126, 34, 0.2);
+  font-weight: 600;
+  border: 1px solid rgba(212, 136, 50, 0.15);
 }

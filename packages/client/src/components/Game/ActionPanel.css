@@ -2,7 +2,7 @@
   display: flex;
   gap: 10px;
   align-items: center;
-  padding: 10px 0;
+  padding: 8px 0;
   flex-wrap: wrap;
 }
 
@@ -10,17 +10,18 @@
   padding: 10px 22px;
   border-radius: 8px;
   border: none;
+  font-family: 'Fredoka', 'Nunito', sans-serif;
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
-  letter-spacing: 0.3px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .action-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.4);
 }
 
 .action-btn:active {
@@ -28,30 +29,22 @@
 }
 
 .action-btn.plant {
-  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+  background: linear-gradient(180deg, var(--green-accent) 0%, var(--green-dark) 100%);
   color: white;
 }
 
 .action-btn.plant:hover {
-  background: linear-gradient(135deg, #3dd87a 0%, #2ecc71 100%);
+  background: linear-gradient(180deg, var(--green-light) 0%, var(--green-accent) 100%);
 }
 
 .action-btn.skip {
-  background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
-  color: white;
-}
-
-.action-btn.skip:hover {
-  background: linear-gradient(135deg, #a1b0b1 0%, #95a5a6 100%);
+  background: linear-gradient(180deg, #8a7e6a 0%, #5d5446 100%);
+  color: var(--text-primary);
 }
 
 .action-btn.end-trade {
-  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  background: linear-gradient(180deg, var(--blue-accent) 0%, #366a94 100%);
   color: white;
-}
-
-.action-btn.end-trade:hover {
-  background: linear-gradient(135deg, #45a3e0 0%, #3498db 100%);
 }
 
 .action-info {
@@ -60,18 +53,20 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  font-weight: 600;
 }
 
 .action-info.waiting {
   font-style: italic;
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
 .planted-counter {
+  font-family: 'Fredoka', 'Nunito', sans-serif;
   font-weight: 700;
   font-size: 15px;
   color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--bg-card);
   padding: 2px 8px;
   border-radius: 4px;
 }

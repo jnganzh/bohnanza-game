@@ -22,16 +22,12 @@ export function BeanCard({ card, selected, highlighted, onClick, small }: Props)
       } as React.CSSProperties}
       onClick={onClick}
     >
-      <div className="bean-card-top">
-        <span className="bean-card-name">{variety.displayName}</span>
-      </div>
-      <div className="bean-card-center">
-        <span className="bean-card-emoji">{variety.emoji}</span>
-      </div>
-      <div className="bean-card-meter">
+      <div className="card-name">{variety.displayName}</div>
+      <div className="card-emoji">{variety.emoji}</div>
+      <div className="card-meter">
         {variety.beanometer.map((tier, i) => (
-          <span key={i} className="tier">
-            {tier.cardCount}:{tier.goldCoins}<span className="tier-coin">🪙</span>
+          <span key={i} className="card-tier">
+            {tier.cardCount}:{tier.goldCoins}g
           </span>
         ))}
       </div>
@@ -42,7 +38,7 @@ export function BeanCard({ card, selected, highlighted, onClick, small }: Props)
 export function BeanCardBack({ small }: { small?: boolean }) {
   return (
     <div className={`bean-card bean-card-back ${small ? 'small' : ''}`}>
-      <div className="coin-icon">🫘</div>
+      <div className="back-icon">🫘</div>
     </div>
   );
 }

@@ -1,14 +1,14 @@
 .trade-offer-card {
   padding: 10px 12px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
   font-size: 13px;
   transition: opacity 0.2s;
 }
 
 .trade-offer-card.accepted {
-  border-color: rgba(39, 174, 96, 0.3);
+  border-color: rgba(95, 163, 59, 0.3);
   opacity: 0.7;
 }
 
@@ -22,29 +22,28 @@
   display: flex;
   gap: 6px;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
+  font-weight: 600;
 }
 
 .offer-from {
-  font-weight: 700;
-  color: #64b5f6;
+  color: var(--blue-accent);
 }
 
 .offer-arrow {
-  color: #556;
-  font-size: 12px;
+  color: var(--text-muted);
+  font-size: 11px;
 }
 
 .offer-to {
-  font-weight: 700;
-  color: #ffb74d;
+  color: var(--orange-accent);
 }
 
 .offer-details {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .offer-side {
@@ -56,28 +55,28 @@
 
 .side-label {
   font-size: 11px;
-  color: #667;
-  min-width: 48px;
-  font-weight: 600;
+  color: var(--text-muted);
+  min-width: 46px;
+  font-weight: 700;
 }
 
 .offer-card-tag {
   padding: 2px 8px;
-  border-radius: 5px;
-  background: rgba(52, 152, 219, 0.15);
-  color: #64b5f6;
+  border-radius: 4px;
+  background: rgba(74, 143, 196, 0.12);
+  color: var(--blue-accent);
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .offer-card-tag.want {
-  background: rgba(230, 126, 34, 0.15);
-  color: #ffb74d;
+  background: rgba(212, 136, 50, 0.12);
+  color: var(--orange-accent);
 }
 
 .offer-card-tag.face-up {
-  background: rgba(241, 196, 15, 0.15);
-  color: #FFD54F;
+  background: rgba(212, 168, 50, 0.12);
+  color: var(--gold-light);
 }
 
 .offer-actions {
@@ -89,55 +88,37 @@
   padding: 5px 14px;
   border-radius: 6px;
   border: none;
+  font-family: 'Nunito', sans-serif;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
 }
 
-.offer-btn:hover {
-  transform: translateY(-1px);
-}
-
 .offer-btn.accept {
-  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+  background: linear-gradient(180deg, var(--green-accent) 0%, var(--green-dark) 100%);
   color: white;
-}
-
-.offer-btn.accept:hover {
-  background: linear-gradient(135deg, #3dd87a 0%, #2ecc71 100%);
 }
 
 .offer-btn.reject {
-  background: linear-gradient(135deg, #ef5350 0%, #c0392b 100%);
+  background: linear-gradient(180deg, var(--red-accent) 0%, #8c2e24 100%);
   color: white;
 }
 
-.offer-btn.reject:hover {
-  background: linear-gradient(135deg, #f06665 0%, #ef5350 100%);
-}
-
 .offer-btn.withdraw {
-  background: rgba(127, 140, 141, 0.3);
+  background: var(--bg-secondary);
   color: var(--text-secondary);
+  border: 1px solid var(--border-light);
 }
 
 .offer-status {
   font-size: 11px;
   font-style: italic;
   margin-top: 4px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
-.offer-status.accepted {
-  color: #66bb6a;
-}
-
-.offer-status.rejected {
-  color: #ef5350;
-}
-
+.offer-status.accepted { color: var(--green-accent); }
+.offer-status.rejected { color: var(--red-accent); }
 .offer-status.withdrawn,
-.offer-status.expired {
-  color: var(--text-secondary);
-}
+.offer-status.expired { color: var(--text-muted); }
