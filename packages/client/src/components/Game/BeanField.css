@@ -124,6 +124,37 @@
   border: 1px solid rgba(95, 163, 59, 0.3);
 }
 
+.plant-here-btn {
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(95, 163, 59, 0.4);
+  background: rgba(95, 163, 59, 0.15);
+  color: var(--green-light);
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  transition: all 0.2s;
+  margin-top: 4px;
+  width: 100%;
+  text-align: center;
+}
+
+.plant-here-btn:hover {
+  background: rgba(95, 163, 59, 0.3);
+}
+
+.harvest-area {
+  margin-top: 8px;
+  width: 100%;
+}
+
+.harvest-confirm {
+  display: flex;
+  gap: 4px;
+  width: 100%;
+}
+
 .harvest-btn {
   padding: 5px 10px;
   border-radius: 6px;
@@ -135,13 +166,25 @@
   font-size: 11px;
   font-weight: 700;
   transition: all 0.2s;
-  margin-top: 4px;
   width: 100%;
   text-align: center;
 }
 
 .harvest-btn:hover {
   background: rgba(196, 75, 63, 0.3);
+}
+
+.harvest-btn.harvest-yes {
+  background: rgba(196, 75, 63, 0.3);
+  border-color: rgba(196, 75, 63, 0.6);
+  flex: 1;
+}
+
+.harvest-btn.harvest-no {
+  background: rgba(160, 144, 128, 0.15);
+  border-color: rgba(160, 144, 128, 0.3);
+  color: var(--text-secondary);
+  flex: 1;
 }
 
 .plant-pending-options {
@@ -166,4 +209,28 @@
 
 .plant-pending-btn:hover {
   background: rgba(212, 136, 50, 0.3);
+}
+
+@media (max-width: 768px) {
+  .bean-field {
+    width: 110px;
+    min-height: 130px;
+    padding: 8px;
+  }
+
+  .planted-emoji {
+    font-size: 26px;
+  }
+
+  .planted-name {
+    font-size: 10px;
+  }
+
+  .planted-count {
+    font-size: 10px;
+  }
+
+  .meter-tier {
+    font-size: 8px;
+  }
 }

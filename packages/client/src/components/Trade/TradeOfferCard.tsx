@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import type { TradeOffer, BeanType, BeanCard as BeanCardType } from '@bohnanza/shared';
 import { TradeOfferStatus, TradeOfferType, BEAN_VARIETIES } from '@bohnanza/shared';
 import { socket } from '../../socket/socketClient.js';
@@ -33,12 +34,40 @@ function canFulfillRequest(hand: BeanCardType[], requestedTypes: BeanType[]): bo
   return true;
 }
 
+const TRADE_TIMEOUT_MS = 30000; // 30 seconds
+
 export function TradeOfferCard({ offer, myId, players, myHand }: Props) {
   const fromName =
     players.find((p) => p.id === offer.fromPlayerId)?.name || '?';
   const toName = offer.toPlayerId
     ? players.find((p) => p.id === offer.toPlayerId)?.name || '?'
     : 'anyone';
+
+  // Trade timer
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
+  useEffect(() => {
+    if (offer.status !== TradeOfferStatus.Pending) return;
+    const update = () => {
+      const elapsed = Date.now() - offer.timestamp;
+      const remaining = Math.max(0, TRADE_TIMEOUT_MS - elapsed);
+      setTimeLeft(remaining);
+      if (remaining <= 0 && offer.fromPlayerId === myId) {
+        // Auto-withdraw if I'm the proposer
+        socket.emit('game:withdraw-trade', { tradeId: offer.id });
+      }
+    };
+    update();
+    const interval = setInterval(update, 1000);
+    return () => clearInterval(interval);
+  }, [offer.status, offer.timestamp, offer.fromPlayerId, offer.id, myId]);
+
+  // Determine color class: mine=green, incoming=blue, completed=grey
+  const isFromMe = offer.fromPlayerId === myId;
+  const colorClass = offer.status !== TradeOfferStatus.Pending
+    ? 'offer-completed'
+    : isFromMe
+    ? 'offer-mine'
+    : 'offer-incoming';
 
   const isPending = offer.status === TradeOfferStatus.Pending;
   const isTargetedAtMe =
@@ -75,31 +104,40 @@ export function TradeOfferCard({ offer, myId, players, myHand }: Props) {
     offer.type === TradeOfferType.Trade;
 
   return (
-    <div className={`trade-offer-card ${offer.status}`}>
+    <div className={`trade-offer-card ${offer.status} ${colorClass}`}>
       <div className="offer-header">
         <span className="offer-from">{fromName}</span>
         <span className="offer-arrow">
-          {offer.type === TradeOfferType.Donation ? 'donates to' : 'trades with'}
+          {offer.type === TradeOfferType.Donation
+            ? (offer.toPlayerId ? 'donates to' : '🎉 donates — grab it!')
+            : 'trades with'}
         </span>
-        <span className="offer-to">{toName}</span>
+        {(offer.type !== TradeOfferType.Donation || offer.toPlayerId) && (
+          <span className="offer-to">{toName}</span>
+        )}
+        {isPending && timeLeft !== null && (
+          <span className={`offer-timer ${timeLeft < 10000 ? 'urgent' : ''}`}>
+            {Math.ceil(timeLeft / 1000)}s
+          </span>
+        )}
       </div>
 
       <div className="offer-details">
-        <div className="offer-side">
-          <span className="side-label">Offers:</span>
+        <div className="offer-side give-side">
+          <span className="side-label">🎁 Gives:</span>
           {offer.offering.fromHand.map((t, i) => (
             <BeanTag key={`h${i}`} beanType={t} />
           ))}
           {offer.offering.fromFaceUp.length > 0 && (
             <span className="offer-card-tag face-up">
-              +{offer.offering.fromFaceUp.length} face-up
+              +{offer.offering.fromFaceUp.length} face-up 🃏
             </span>
           )}
         </div>
         {offer.type === TradeOfferType.Trade &&
           offer.requesting.fromHand.length > 0 && (
-            <div className="offer-side">
-              <span className="side-label">Wants:</span>
+            <div className="offer-side want-side">
+              <span className="side-label">🔄 Wants:</span>
               {offer.requesting.fromHand.map((t, i) => (
                 <BeanTag key={`r${i}`} beanType={t} className="want" />
               ))}

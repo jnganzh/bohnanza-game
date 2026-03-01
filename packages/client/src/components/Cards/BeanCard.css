@@ -114,3 +114,25 @@
 .small .back-icon {
   font-size: 22px;
 }
+
+@media (max-width: 768px) {
+  .bean-card {
+    width: 68px;
+    height: 96px;
+    padding: 5px 4px 4px;
+    border-radius: 6px;
+  }
+
+  .card-name {
+    font-size: 8px;
+  }
+
+  .card-emoji {
+    font-size: 22px;
+  }
+
+  .card-tier {
+    font-size: 7px;
+    padding: 1px 3px;
+  }
+}

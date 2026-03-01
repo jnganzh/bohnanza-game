@@ -169,6 +169,7 @@ export function GameBoard() {
                     phase={gameState.turn.phase}
                     isMyTurn={isMyTurn}
                     pendingCards={gameState.myPendingPlanting}
+                    topHandCard={gameState.myHand[0]}
                   />
                 ))}
                 {!gameState.myHasThirdField && (

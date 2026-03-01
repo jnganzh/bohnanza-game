@@ -23,7 +23,7 @@ export interface ClientToServerEvents {
     requesting: { fromHand: BeanType[] };
   }) => void;
   'game:propose-donation': (data: {
-    toPlayerId: string;
+    toPlayerId: string | null;
     cards: { fromHand: BeanType[]; fromFaceUp: string[] };
   }) => void;
   'game:accept-trade': (data: { tradeId: string }) => void;

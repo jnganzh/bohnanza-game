@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { BeanField, BeanCard as BeanCardType, GamePhase as GamePhaseType } from '@bohnanza/shared';
 import { GamePhase, BEAN_VARIETIES } from '@bohnanza/shared';
 import { socket } from '../../socket/socketClient.js';
@@ -10,6 +11,8 @@ interface Props {
   phase: GamePhaseType;
   isMyTurn: boolean;
   pendingCards?: BeanCardType[];
+  /** The top card of the player's hand (for smart plant behavior) */
+  topHandCard?: BeanCardType;
 }
 
 export function BeanFieldComp({
@@ -19,7 +22,9 @@ export function BeanFieldComp({
   phase,
   isMyTurn,
   pendingCards,
+  topHandCard,
 }: Props) {
+  const [confirmHarvest, setConfirmHarvest] = useState(false);
   const isEmpty = field.cards.length === 0;
   const variety = field.beanType ? BEAN_VARIETIES[field.beanType] : null;
 
@@ -27,6 +32,9 @@ export function BeanFieldComp({
     isMyField &&
     isMyTurn &&
     phase === GamePhase.PlantFromHand;
+
+  // Smart plant: if the field has the same type as the top hand card, clicking plants
+  const canSmartPlant = canPlant && !isEmpty && topHandCard && topHandCard.type === field.beanType;
 
   const canPlantPending =
     isMyField &&
@@ -42,7 +50,19 @@ export function BeanFieldComp({
 
   const handleHarvest = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!confirmHarvest) {
+      setConfirmHarvest(true);
+      // Auto-dismiss after 3 seconds
+      setTimeout(() => setConfirmHarvest(false), 3000);
+      return;
+    }
     socket.emit('game:harvest-field', { fieldIndex });
+    setConfirmHarvest(false);
+  };
+
+  const handleCancelHarvest = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setConfirmHarvest(false);
   };
 
   const handlePlantPending = (cardId: string) => {
@@ -78,10 +98,28 @@ export function BeanFieldComp({
               </span>
             ))}
           </div>
-          {isMyField && (
-            <button className="harvest-btn" onClick={handleHarvest}>
-              Harvest
+          {isMyField && canSmartPlant && (
+            <button className="plant-here-btn" onClick={handleClick}>
+              🌱 Plant Here
             </button>
+          )}
+          {isMyField && (
+            <div className="harvest-area">
+              {confirmHarvest ? (
+                <div className="harvest-confirm">
+                  <button className="harvest-btn harvest-yes" onClick={handleHarvest}>
+                    ✓ Confirm
+                  </button>
+                  <button className="harvest-btn harvest-no" onClick={handleCancelHarvest}>
+                    ✗ Cancel
+                  </button>
+                </div>
+              ) : (
+                <button className="harvest-btn" onClick={handleHarvest}>
+                  Harvest
+                </button>
+              )}
+            </div>
           )}
         </div>
       )}

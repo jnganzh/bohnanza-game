@@ -109,3 +109,24 @@
 .phase-turn-info strong {
   color: var(--text-secondary);
 }
+
+@media (max-width: 768px) {
+  .phase-details {
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px 12px;
+  }
+
+  .your-turn-text {
+    font-size: 13px;
+    letter-spacing: 2px;
+  }
+
+  .phase-badge {
+    font-size: 11px;
+  }
+
+  .phase-hint, .phase-turn-info {
+    font-size: 11px;
+  }
+}

@@ -50,9 +50,8 @@ export function TradeOfferForm({ gameState, isMyTurn }: Props) {
       .map((c) => c!.type);
 
     if (isDonation) {
-      if (!targetPlayer) return;
       socket.emit('game:propose-donation', {
-        toPlayerId: targetPlayer,
+        toPlayerId: targetPlayer || null,
         cards: {
           fromHand: offeringFromHand,
           fromFaceUp: selectedFaceUpCards,
@@ -91,7 +90,14 @@ export function TradeOfferForm({ gameState, isMyTurn }: Props) {
         const v = BEAN_VARIETIES[c!.type];
         return `${v.emoji} ${v.displayName}`;
       }),
-    ...selectedFaceUpCards.map(() => 'Face-up card'),
+    ...selectedFaceUpCards.map((id) => {
+      const faceUpCard = gameState.turn.drawnFaceUpCards.find((c) => c.id === id);
+      if (faceUpCard) {
+        const v = BEAN_VARIETIES[faceUpCard.type];
+        return `🃏 ${v.emoji} ${v.displayName}`;
+      }
+      return '🃏 Face-up card';
+    }),
   ];
 
   return (
@@ -121,7 +127,7 @@ export function TradeOfferForm({ gameState, isMyTurn }: Props) {
           value={targetPlayer}
           onChange={(e) => setTargetPlayer(e.target.value)}
         >
-          <option value="">{isDonation ? 'Select player' : 'Open offer (anyone)'}</option>
+          <option value="">{isDonation ? 'All players (fastest fingers!)' : 'Open offer (anyone)'}</option>
           {gameState.opponents.map((opp) => (
             <option key={opp.id} value={opp.id}>
               {opp.name}
@@ -132,7 +138,7 @@ export function TradeOfferForm({ gameState, isMyTurn }: Props) {
 
       {/* Selected offering display */}
       <div className="form-section">
-        <label>Offering:</label>
+        <label>🎁 What I Give:</label>
         {selectedOfferingDisplay.length > 0 ? (
           <div className="selected-beans-display">
             {selectedOfferingDisplay.map((text, i) => (
@@ -149,7 +155,7 @@ export function TradeOfferForm({ gameState, isMyTurn }: Props) {
       {/* Wanted beans picker (only for trades, not donations) */}
       {!isDonation && (
         <div className="form-section">
-          <label>Wanting:</label>
+          <label>🔄 What I Want:</label>
           <div className="bean-picker">
             {ALL_BEAN_TYPES.map((beanType) => {
               const variety = BEAN_VARIETIES[beanType];
@@ -203,7 +209,7 @@ export function TradeOfferForm({ gameState, isMyTurn }: Props) {
       <button
         className="propose-btn"
         onClick={handlePropose}
-        disabled={!hasSelection || (isDonation && !targetPlayer)}
+        disabled={!hasSelection}
       >
         {isDonation ? 'Donate' : 'Propose Trade'}
       </button>
