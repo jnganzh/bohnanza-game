@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { socket } from '../../socket/socketClient.js';
 import { useLobbyStore } from '../../stores/useLobbyStore.js';
+import { ChatPanel } from '../Chat/ChatPanel.js';
 import './LobbyScreen.css';
 
 export function LobbyScreen() {
@@ -235,6 +236,7 @@ export function LobbyScreen() {
         )}
       </div>
       {error && <p className="error">{error}</p>}
+      {roomId && <ChatPanel />}
     </div>
   );
 }

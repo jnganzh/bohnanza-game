@@ -2,6 +2,7 @@ import { socket, getPlayerToken } from './socketClient.js';
 import { useLobbyStore } from '../stores/useLobbyStore.js';
 import { useGameStore } from '../stores/useGameStore.js';
 import { useTradeStore } from '../stores/useTradeStore.js';
+import { useChatStore } from '../stores/useChatStore.js';
 
 export function registerSocketListeners(): void {
   const lobbyStore = useLobbyStore;
@@ -108,5 +109,10 @@ export function registerSocketListeners(): void {
 
   socket.on('trade:all-expired', () => {
     tradeStore.getState().clearOffers();
+  });
+
+  // Chat
+  socket.on('chat:message', (data) => {
+    useChatStore.getState().addMessage(data);
   });
 }

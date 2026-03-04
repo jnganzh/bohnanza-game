@@ -3,6 +3,7 @@ import { useGameStore } from '../../stores/useGameStore.js';
 import { useLobbyStore } from '../../stores/useLobbyStore.js';
 import { GamePhase, BEAN_VARIETIES } from '@bohnanza/shared';
 import { PlayerHand } from './PlayerHand.js';
+import { ChatPanel } from '../Chat/ChatPanel.js';
 import { BeanFieldComp } from './BeanField.js';
 import { OpponentArea } from './OpponentArea.js';
 import { PhaseIndicator } from './PhaseIndicator.js';
@@ -229,6 +230,7 @@ export function GameBoard() {
           />
         </div>
       </div>
+      <ChatPanel />
     </div>
   );
 }
