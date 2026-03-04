@@ -28,6 +28,9 @@ export function registerSocketListeners(): void {
       if (data.roomId) {
         lobbyStore.getState().setRoomId(data.roomId);
       }
+      if (data.hostId) {
+        lobbyStore.getState().setHostId(data.hostId);
+      }
     } else if (data.roomId && data.roomPlayers) {
       // Rejoin waiting room
       lobbyStore.getState().setRoomId(data.roomId);

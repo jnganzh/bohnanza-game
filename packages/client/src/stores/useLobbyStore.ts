@@ -25,6 +25,7 @@ interface LobbyStore {
   setRoomId: (id: string | null) => void;
   setRooms: (rooms: RoomInfo[]) => void;
   setRoomPlayers: (players: RoomPlayer[], maxPlayers: number, hostId: string) => void;
+  setHostId: (hostId: string) => void;
   setError: (error: string | null) => void;
   reset: () => void;
 }
@@ -46,6 +47,7 @@ export const useLobbyStore = create<LobbyStore>((set) => ({
   setRooms: (rooms) => set({ rooms }),
   setRoomPlayers: (players, maxPlayers, hostId) =>
     set({ roomPlayers: players, maxPlayers, hostId }),
+  setHostId: (hostId) => set({ hostId }),
   setError: (error) => set({ error }),
   reset: () =>
     set({

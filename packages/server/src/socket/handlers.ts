@@ -53,10 +53,12 @@ export function registerHandlers(io: Server, socket: TypedSocket): void {
           const clientState = session.getClientState(record.playerId);
           io.to(record.roomId).emit('player:reconnected', { playerId: record.playerId });
           session.broadcastState();
+          const activeRoom = roomManager.getRoom(record.roomId);
           socket.emit('lobby:reconnected', {
             roomId: record.roomId,
             inGame: true,
             state: clientState,
+            hostId: activeRoom?.hostPlayerId,
           });
         } else {
           // Reconnect into waiting room
