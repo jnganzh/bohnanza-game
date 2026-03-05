@@ -117,6 +117,29 @@ class RoomManager {
       if (player) player.socketId = newSocketId;
     }
   }
+
+  addBot(roomId: string, hostPlayerId: string, botId: string, botName: string): Room | string {
+    const room = this.rooms.get(roomId);
+    if (!room) return 'Room not found';
+    if (room.hostPlayerId !== hostPlayerId) return 'Only the host can add bots';
+    if (room.status !== 'waiting') return 'Cannot add bots during a game';
+    if (room.players.length >= room.maxPlayers) return 'Room is full';
+
+    room.players.push({ id: botId, name: botName, socketId: '', isBot: true });
+    return room;
+  }
+
+  removeBot(roomId: string, hostPlayerId: string, botId: string): Room | string {
+    const room = this.rooms.get(roomId);
+    if (!room) return 'Room not found';
+    if (room.hostPlayerId !== hostPlayerId) return 'Only the host can remove bots';
+
+    const bot = room.players.find(p => p.id === botId && p.isBot);
+    if (!bot) return 'Bot not found';
+
+    room.players = room.players.filter(p => p.id !== botId);
+    return room;
+  }
 }
 
 export const roomManager = new RoomManager();

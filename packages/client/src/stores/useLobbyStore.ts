@@ -10,6 +10,7 @@ interface RoomInfo {
 interface RoomPlayer {
   id: string;
   name: string;
+  isBot?: boolean;
 }
 
 interface LobbyStore {

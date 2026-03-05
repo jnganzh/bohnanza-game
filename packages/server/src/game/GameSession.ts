@@ -19,12 +19,14 @@ const VALID_BEAN_TYPES = new Set<string>(Object.values(BeanTypeEnum));
 import { filterForPlayer } from './stateSync.js';
 import { gameSessionStore } from './GameSessionStore.js';
 import { nanoid } from 'nanoid';
+import type { BotPlayer } from '../bot/BotPlayer.js';
 
 export class GameSession {
   private state: GameState;
   private io: Server;
   private roomId: string;
   private playerSockets: Map<string, string>; // playerId -> socketId
+  private botPlayers: Map<string, BotPlayer> = new Map();
 
   constructor(
     io: Server,
@@ -34,12 +36,25 @@ export class GameSession {
     this.io = io;
     this.roomId = roomId;
     this.playerSockets = new Map(
-      players.map((p) => [p.id, p.socketId])
+      players.filter((p) => p.socketId !== '').map((p) => [p.id, p.socketId])
     );
     this.state = GameEngine.createGame(
       players.map((p) => ({ id: p.id, name: p.name })),
       roomId
     );
+  }
+
+  registerBot(bot: BotPlayer): void {
+    this.botPlayers.set(bot.id, bot);
+    bot.attachSession(this);
+  }
+
+  unregisterBot(botId: string): void {
+    const bot = this.botPlayers.get(botId);
+    if (bot) {
+      bot.detach();
+      this.botPlayers.delete(botId);
+    }
   }
 
   getState(): GameState {
@@ -266,6 +281,15 @@ export class GameSession {
     for (const [playerId, socketId] of this.playerSockets) {
       const clientState = filterForPlayer(this.state, playerId);
       this.io.to(socketId).emit('game:state-update', { state: clientState });
+    }
+    // Notify bots of state change
+    this.notifyBots();
+  }
+
+  private notifyBots(): void {
+    for (const bot of this.botPlayers.values()) {
+      // Use setImmediate to avoid re-entrancy issues
+      setImmediate(() => bot.onStateChanged(this.state));
     }
   }
 

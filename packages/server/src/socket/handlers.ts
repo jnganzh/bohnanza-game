@@ -4,6 +4,7 @@ import { roomManager } from './rooms.js';
 import { gameSessionStore } from '../game/GameSessionStore.js';
 import { GameSession } from '../game/GameSession.js';
 import { nanoid } from 'nanoid';
+import { BotPlayer, getNextBotName } from '../bot/BotPlayer.js';
 
 type TypedSocket = Socket<ClientToServerEvents, ServerToClientEvents>;
 
@@ -111,7 +112,7 @@ export function registerHandlers(io: Server, socket: TypedSocket): void {
 
     socket.emit('lobby:room-created', { roomId: room.id });
     socket.emit('lobby:room-updated', {
-      players: room.players.map((p) => ({ id: p.id, name: p.name })),
+      players: room.players.map((p) => ({ id: p.id, name: p.name, isBot: p.isBot })),
       maxPlayers: room.maxPlayers,
       hostId: room.hostPlayerId,
     });
@@ -140,7 +141,7 @@ export function registerHandlers(io: Server, socket: TypedSocket): void {
     socket.emit('lobby:room-created', { roomId: result.id });
 
     io.to(result.id).emit('lobby:room-updated', {
-      players: result.players.map((p) => ({ id: p.id, name: p.name })),
+      players: result.players.map((p) => ({ id: p.id, name: p.name, isBot: p.isBot })),
       maxPlayers: result.maxPlayers,
       hostId: result.hostPlayerId,
     });
@@ -163,7 +164,7 @@ export function registerHandlers(io: Server, socket: TypedSocket): void {
 
     if (room) {
       io.to(room.id).emit('lobby:room-updated', {
-        players: room.players.map((p) => ({ id: p.id, name: p.name })),
+        players: room.players.map((p) => ({ id: p.id, name: p.name, isBot: p.isBot })),
         maxPlayers: room.maxPlayers,
         hostId: room.hostPlayerId,
       });
@@ -207,7 +208,39 @@ export function registerHandlers(io: Server, socket: TypedSocket): void {
     }
 
     io.to(result.id).emit('lobby:room-updated', {
-      players: result.players.map((p) => ({ id: p.id, name: p.name })),
+      players: result.players.map((p) => ({ id: p.id, name: p.name, isBot: p.isBot })),
+      maxPlayers: result.maxPlayers,
+      hostId: result.hostPlayerId,
+    });
+    io.emit('lobby:room-list', { rooms: roomManager.getRoomList() });
+  });
+
+  socket.on('lobby:add-bot', () => {
+    if (!record || !record.roomId) return;
+    const botId = `bot-${nanoid(6)}`;
+    const botName = getNextBotName();
+    const result = roomManager.addBot(record.roomId, record.playerId, botId, botName);
+    if (typeof result === 'string') {
+      socket.emit('lobby:error', { message: result });
+      return;
+    }
+    io.to(result.id).emit('lobby:room-updated', {
+      players: result.players.map((p) => ({ id: p.id, name: p.name, isBot: p.isBot })),
+      maxPlayers: result.maxPlayers,
+      hostId: result.hostPlayerId,
+    });
+    io.emit('lobby:room-list', { rooms: roomManager.getRoomList() });
+  });
+
+  socket.on('lobby:remove-bot', (data) => {
+    if (!record || !record.roomId) return;
+    const result = roomManager.removeBot(record.roomId, record.playerId, data.botId);
+    if (typeof result === 'string') {
+      socket.emit('lobby:error', { message: result });
+      return;
+    }
+    io.to(result.id).emit('lobby:room-updated', {
+      players: result.players.map((p) => ({ id: p.id, name: p.name, isBot: p.isBot })),
       maxPlayers: result.maxPlayers,
       hostId: result.hostPlayerId,
     });
@@ -233,7 +266,16 @@ export function registerHandlers(io: Server, socket: TypedSocket): void {
     const session = new GameSession(io, record.roomId, room.players);
     gameSessionStore.set(record.roomId, session);
 
+    // Create and register bot players
     for (const p of room.players) {
+      if (p.isBot) {
+        const bot = new BotPlayer(p.id, p.name);
+        session.registerBot(bot);
+      }
+    }
+
+    for (const p of room.players) {
+      if (p.isBot) continue; // Bots don't have sockets
       const clientState = session.getClientState(p.id);
       console.log(`[start-game] Sending game:started to player ${p.id} (${p.name}) via socketId ${p.socketId}`);
       const targetSocket = io.sockets.sockets.get(p.socketId);
@@ -243,6 +285,9 @@ export function registerHandlers(io: Server, socket: TypedSocket): void {
         console.log(`[start-game] WARNING: No socket found for socketId ${p.socketId}`);
       }
     }
+
+    // Trigger initial bot notification after game start
+    session.broadcastState();
 
     io.emit('lobby:room-list', { rooms: roomManager.getRoomList() });
   });

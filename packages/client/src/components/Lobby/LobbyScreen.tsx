@@ -59,6 +59,14 @@ export function LobbyScreen() {
     socket.emit('lobby:start-game');
   };
 
+  const handleAddBot = () => {
+    socket.emit('lobby:add-bot');
+  };
+
+  const handleRemoveBot = (botId: string) => {
+    socket.emit('lobby:remove-bot', { botId });
+  };
+
   // Determine if current player is the host
   const myPlayer = roomPlayers.find((p) => p.name === playerName);
   const isHost = myPlayer ? myPlayer.id === hostId : false;
@@ -142,11 +150,20 @@ export function LobbyScreen() {
                 {roomPlayers[i] ? (
                   <>
                     <span className="player-name">
-                      <span className="player-icon">🧑‍🌾</span>
+                      <span className="player-icon">{roomPlayers[i].isBot ? '🤖' : '🧑‍🌾'}</span>
                       {roomPlayers[i].name}
                     </span>
                     {roomPlayers[i].id === hostId && (
                       <span className="host-badge">Host</span>
+                    )}
+                    {isHost && roomPlayers[i].isBot && (
+                      <button
+                        className="btn-danger btn-sm"
+                        onClick={() => handleRemoveBot(roomPlayers[i].id)}
+                        style={{ marginLeft: 8, padding: '2px 8px', fontSize: '0.8rem' }}
+                      >
+                        Remove
+                      </button>
                     )}
                   </>
                 ) : (
@@ -166,6 +183,11 @@ export function LobbyScreen() {
                 className="btn-primary btn-large"
               >
                 Start Game ({roomPlayers.length}/{maxPlayers})
+              </button>
+            )}
+            {isHost && roomPlayers.length < maxPlayers && (
+              <button onClick={handleAddBot} className="btn-secondary">
+                🤖 Add Bot
               </button>
             )}
             <button onClick={handleLeaveRoom} className="btn-secondary">
