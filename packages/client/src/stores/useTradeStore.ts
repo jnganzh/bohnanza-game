@@ -5,12 +5,14 @@ interface TradeStore {
   offers: TradeOffer[];
   selectedHandCards: string[];
   selectedFaceUpCards: string[];
+  selectedRequestFaceUpCards: string[];
 
   addOffer: (offer: TradeOffer) => void;
   updateOfferStatus: (tradeId: string, status: TradeOffer['status']) => void;
   clearOffers: () => void;
   toggleHandCard: (cardId: string) => void;
   toggleFaceUpCard: (cardId: string) => void;
+  toggleRequestFaceUpCard: (cardId: string) => void;
   clearSelection: () => void;
 }
 
@@ -18,6 +20,7 @@ export const useTradeStore = create<TradeStore>((set) => ({
   offers: [],
   selectedHandCards: [],
   selectedFaceUpCards: [],
+  selectedRequestFaceUpCards: [],
 
   addOffer: (offer) =>
     set((s) => {
@@ -52,5 +55,12 @@ export const useTradeStore = create<TradeStore>((set) => ({
         : [...s.selectedFaceUpCards, cardId],
     })),
 
-  clearSelection: () => set({ selectedHandCards: [], selectedFaceUpCards: [] }),
+  toggleRequestFaceUpCard: (cardId) =>
+    set((s) => ({
+      selectedRequestFaceUpCards: s.selectedRequestFaceUpCards.includes(cardId)
+        ? s.selectedRequestFaceUpCards.filter((id) => id !== cardId)
+        : [...s.selectedRequestFaceUpCards, cardId],
+    })),
+
+  clearSelection: () => set({ selectedHandCards: [], selectedFaceUpCards: [], selectedRequestFaceUpCards: [] }),
 }));

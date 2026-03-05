@@ -580,7 +580,7 @@ describe('GameEngine', () => {
       }
     });
 
-    it('should reject trade between two non-active players', () => {
+    it('should allow non-active player to propose trade', () => {
       const state = getToPhase2WithSetup();
 
       const offer: TradeOffer = {
@@ -596,7 +596,7 @@ describe('GameEngine', () => {
       };
 
       const result = TradeManager.proposeTrade(state, offer);
-      expect(isGameError(result)).toBe(true);
+      expect(isGameError(result)).toBe(false);
     });
 
     it('should reject non-active player offering face-up cards', () => {

@@ -19,7 +19,7 @@ export interface ClientToServerEvents {
   'game:keep-face-up-card': (data: { cardId: string }) => void;
   'game:propose-trade': (data: {
     offering: { fromHand: BeanType[]; fromFaceUp: string[] };
-    requesting: { fromHand: BeanType[] };
+    requesting: { fromHand: BeanType[]; fromFaceUp?: string[] };
   }) => void;
   'game:propose-donation': (data: {
     cards: { fromHand: BeanType[]; fromFaceUp: string[] };

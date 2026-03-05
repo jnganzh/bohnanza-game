@@ -73,6 +73,17 @@ export class TradeManager {
         toHand = result.hand;
         cardsForFrom.push(result.card);
       }
+
+      // Handle requested face-up cards (non-active player requesting active player's face-up cards)
+      for (const cardId of offer.requesting.fromFaceUp) {
+        const card = state.turn.drawnFaceUpCards.find((c) => c.id === cardId);
+        if (!card) return { code: 'CARD_MISSING', message: 'Requested face-up card no longer available' };
+        if (state.turn.keptFaceUpCardIds.includes(cardId)) {
+          return { code: 'CARD_MISSING', message: 'Requested face-up card already claimed' };
+        }
+        cardsForFrom.push(card);
+        tradedFaceUpIds.push(cardId);
+      }
     }
 
     // Update players

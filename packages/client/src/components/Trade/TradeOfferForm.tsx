@@ -16,6 +16,7 @@ export function TradeOfferForm({ gameState, isMyTurn }: Props) {
   const {
     selectedHandCards,
     selectedFaceUpCards,
+    selectedRequestFaceUpCards,
     clearSelection,
   } = useTradeStore();
 
@@ -23,7 +24,7 @@ export function TradeOfferForm({ gameState, isMyTurn }: Props) {
   const [wantedBeans, setWantedBeans] = useState<Record<string, number>>({});
 
   const hasSelection =
-    selectedHandCards.length > 0 || selectedFaceUpCards.length > 0;
+    selectedHandCards.length > 0 || selectedFaceUpCards.length > 0 || selectedRequestFaceUpCards.length > 0;
 
   const hasWantedBeans =
     Object.values(wantedBeans).some((count) => count > 0);
@@ -69,7 +70,7 @@ export function TradeOfferForm({ gameState, isMyTurn }: Props) {
           fromHand: offeringFromHand,
           fromFaceUp: selectedFaceUpCards,
         },
-        requesting: { fromHand: wantedTypes },
+        requesting: { fromHand: wantedTypes, fromFaceUp: selectedRequestFaceUpCards },
       });
     }
 
@@ -181,6 +182,30 @@ export function TradeOfferForm({ gameState, isMyTurn }: Props) {
                 })}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Face-up card request picker for non-active players */}
+      {!isDonation && !isMyTurn && gameState.turn.drawnFaceUpCards.length > 0 && (
+        <div className="form-section">
+          <label>🃏 Request Face-Up Cards:</label>
+          <div className="face-up-request-picker">
+            {gameState.turn.drawnFaceUpCards
+              .filter((c) => !gameState.turn.keptFaceUpCardIds.includes(c.id))
+              .map((card) => {
+                const v = BEAN_VARIETIES[card.type];
+                const isSelected = selectedRequestFaceUpCards.includes(card.id);
+                return (
+                  <button
+                    key={card.id}
+                    className={`face-up-request-btn ${isSelected ? 'selected' : ''}`}
+                    onClick={() => useTradeStore.getState().toggleRequestFaceUpCard(card.id)}
+                  >
+                    {v.emoji} {v.displayName}
+                  </button>
+                );
+              })}
+          </div>
         </div>
       )}
 

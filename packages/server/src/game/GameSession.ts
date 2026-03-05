@@ -101,7 +101,7 @@ export class GameSession {
     playerId: string,
     data: {
       offering: { fromHand: BeanType[]; fromFaceUp: string[] };
-      requesting: { fromHand: BeanType[] };
+      requesting: { fromHand: BeanType[]; fromFaceUp?: string[] };
     }
   ): void {
     // Validate that all bean types are valid enum values
@@ -122,7 +122,7 @@ export class GameSession {
       fromPlayerId: playerId,
       toPlayerId: null,
       offering: data.offering,
-      requesting: { fromHand: data.requesting.fromHand, fromFaceUp: [] },
+      requesting: { fromHand: data.requesting.fromHand, fromFaceUp: data.requesting.fromFaceUp || [] },
       status: TradeOfferStatus.Pending,
       rejectedByPlayerIds: [],
       timestamp: Date.now(),
