@@ -24,6 +24,7 @@ export function useVoiceChat() {
   const peersRef = useRef<Map<string, VoicePeer>>(new Map());
   const streamRef = useRef<MediaStream | null>(null);
   const joinedRef = useRef(false);
+  const pendingSignalsRef = useRef<Map<string, SimplePeer.SignalData[]>>(new Map());
 
   // Sync peers map to state
   const syncPeersState = useCallback(() => {
@@ -130,6 +131,15 @@ export function useVoiceChat() {
         syncPeersState();
       });
 
+      // Flush any signals that arrived before peer was created
+      const pending = pendingSignalsRef.current.get(playerId);
+      if (pending) {
+        for (const sig of pending) {
+          peer.signal(sig);
+        }
+        pendingSignalsRef.current.delete(playerId);
+      }
+
       syncPeersState();
     },
     [detectSpeaking, syncPeersState]
@@ -168,6 +178,12 @@ export function useVoiceChat() {
       const vp = peersRef.current.get(data.fromPlayerId);
       if (vp) {
         vp.peer.signal(data.signal as SimplePeer.SignalData);
+      } else {
+        // Signal arrived before peer-joined event — buffer it
+        if (!pendingSignalsRef.current.has(data.fromPlayerId)) {
+          pendingSignalsRef.current.set(data.fromPlayerId, []);
+        }
+        pendingSignalsRef.current.get(data.fromPlayerId)!.push(data.signal as SimplePeer.SignalData);
       }
     };
 
