@@ -10,6 +10,7 @@ import { ActionPanel } from './ActionPanel.js';
 import { TradePanel } from '../Trade/TradePanel.js';
 import { FaceUpCards } from '../Trade/FaceUpCards.js';
 import { GameOverScreen } from './GameOverScreen.js';
+import { VoiceChatPanel } from '../VoiceChat/VoiceChatPanel.js';
 import { socket } from '../../socket/socketClient.js';
 import './GameBoard.css';
 
@@ -227,6 +228,7 @@ export function GameBoard() {
             gameState={gameState}
             isMyTurn={isMyTurn}
           />
+          <VoiceChatPanel />
         </div>
       </div>
     </div>
