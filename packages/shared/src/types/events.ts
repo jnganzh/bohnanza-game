@@ -35,10 +35,6 @@ export interface ClientToServerEvents {
   'game:end-game': () => void;
 
   'chat:message': (data: { text: string }) => void;
-
-  'voice:join': () => void;
-  'voice:leave': () => void;
-  'voice:signal': (data: { targetPlayerId: string; signal: unknown }) => void;
 }
 
 export interface ServerToClientEvents {
@@ -92,9 +88,4 @@ export interface ServerToClientEvents {
 
   'player:disconnected': (data: { playerId: string }) => void;
   'player:reconnected': (data: { playerId: string }) => void;
-
-  'voice:peers': (data: { peers: { playerId: string; playerName: string }[] }) => void;
-  'voice:peer-joined': (data: { playerId: string; playerName: string }) => void;
-  'voice:peer-left': (data: { playerId: string }) => void;
-  'voice:signal': (data: { fromPlayerId: string; signal: unknown }) => void;
 }
