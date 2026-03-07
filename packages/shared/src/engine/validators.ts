@@ -64,12 +64,27 @@ export function validateTrade(state: GameState, offer: TradeOffer): string | nul
   }
 
   const activeId = state.turn.activePlayerId;
-  if (offer.fromPlayerId !== activeId) {
-    return 'Only the active player can propose trades';
-  }
 
+  // Non-active players cannot offer face-up cards (they don't own them)
   if (offer.fromPlayerId !== activeId && offer.offering.fromFaceUp.length > 0) {
     return 'Non-active players cannot offer face-up cards';
+  }
+
+  // Non-active players cannot request face-up cards via requesting.fromFaceUp
+  // — they CAN request them; only the active player can offer them
+  // Validate that requested face-up cards exist and are available
+  if (offer.requesting.fromFaceUp.length > 0) {
+    // Only allow requesting face-up cards from the active player
+    if (offer.fromPlayerId === activeId) {
+      return 'Active player cannot request their own face-up cards';
+    }
+    for (const cardId of offer.requesting.fromFaceUp) {
+      const exists = state.turn.drawnFaceUpCards.some((c) => c.id === cardId);
+      if (!exists) return 'Requested face-up card not found';
+      if (state.turn.keptFaceUpCardIds.includes(cardId)) {
+        return 'Requested face-up card has already been kept';
+      }
+    }
   }
 
   const fromPlayer = state.players.find((p) => p.id === offer.fromPlayerId);
