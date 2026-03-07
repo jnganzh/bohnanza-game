@@ -390,6 +390,9 @@ export function registerHandlers(io: Server, socket: TypedSocket): void {
       playerId: pid,
       playerName: name,
     }));
+    const roomSockets = io.sockets.adapter.rooms.get(roomId);
+    console.log('[voice] room', roomId, 'has', roomSockets?.size ?? 0, 'sockets:', Array.from(roomSockets ?? []));
+    console.log('[voice] this socket', socket.id, 'rooms:', Array.from(socket.rooms));
     console.log('[voice] sending voice:peers to', record.playerId, ':', existingPeers.length, 'existing peers');
     socket.emit('voice:peers', { peers: existingPeers });
 
