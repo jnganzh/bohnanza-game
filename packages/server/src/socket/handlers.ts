@@ -19,20 +19,6 @@ interface PlayerRecord {
 const playersByToken = new Map<string, PlayerRecord>();
 const playersBySocketId = new Map<string, PlayerRecord>();
 
-// Voice chat: roomId -> Map<playerId, playerName>
-const voicePeersByRoom = new Map<string, Map<string, string>>();
-
-function handleVoiceLeave(roomId: string, playerId: string, socket: TypedSocket, io: Server): void {
-  const voicePeers = voicePeersByRoom.get(roomId);
-  if (!voicePeers) return;
-  if (!voicePeers.has(playerId)) return;
-  voicePeers.delete(playerId);
-  if (voicePeers.size === 0) {
-    voicePeersByRoom.delete(roomId);
-  }
-  io.to(roomId).emit('voice:peer-left', { playerId });
-}
-
 export function registerHandlers(io: Server, socket: TypedSocket): void {
   let record: PlayerRecord | null = null;
 
@@ -372,65 +358,6 @@ export function registerHandlers(io: Server, socket: TypedSocket): void {
     io.emit('lobby:room-list', { rooms: roomManager.getRoomList() });
   });
 
-  // ---- Voice Chat ----
-
-  socket.on('voice:join', () => {
-    console.log('[voice] voice:join from', record?.playerId, 'room:', record?.roomId);
-    if (!record?.roomId) return;
-    const roomId = record.roomId;
-
-    // Initialize voice peers set for this room
-    if (!voicePeersByRoom.has(roomId)) {
-      voicePeersByRoom.set(roomId, new Map());
-    }
-    const voicePeers = voicePeersByRoom.get(roomId)!;
-
-    // Send existing voice peers to the joining player
-    const existingPeers = Array.from(voicePeers.entries()).map(([pid, name]) => ({
-      playerId: pid,
-      playerName: name,
-    }));
-    const roomSockets = io.sockets.adapter.rooms.get(roomId);
-    console.log('[voice] room', roomId, 'has', roomSockets?.size ?? 0, 'sockets:', Array.from(roomSockets ?? []));
-    console.log('[voice] this socket', socket.id, 'rooms:', Array.from(socket.rooms));
-    console.log('[voice] sending voice:peers to', record.playerId, ':', existingPeers.length, 'existing peers');
-    socket.emit('voice:peers', { peers: existingPeers });
-
-    // Add the new player
-    voicePeers.set(record.playerId, record.playerName);
-
-    // Notify existing voice peers about the new player (so they initiate connections)
-    console.log('[voice] broadcasting voice:peer-joined for', record.playerId, 'to room', roomId);
-    socket.to(roomId).emit('voice:peer-joined', {
-      playerId: record.playerId,
-      playerName: record.playerName,
-    });
-  });
-
-  socket.on('voice:leave', () => {
-    if (!record?.roomId) return;
-    handleVoiceLeave(record.roomId, record.playerId, socket, io);
-  });
-
-  socket.on('voice:signal', (data) => {
-    if (!record?.roomId) return;
-    const { targetPlayerId, signal } = data;
-
-    // Find target socket and relay signal
-    for (const [, pr] of playersBySocketId) {
-      if (pr.playerId === targetPlayerId && pr.socketId) {
-        const targetSocket = io.sockets.sockets.get(pr.socketId);
-        if (targetSocket) {
-          targetSocket.emit('voice:signal', {
-            fromPlayerId: record.playerId,
-            signal,
-          });
-        }
-        break;
-      }
-    }
-  });
-
   // ---- Chat ----
 
   socket.on('chat:message', (data) => {
@@ -448,9 +375,6 @@ export function registerHandlers(io: Server, socket: TypedSocket): void {
   socket.on('disconnect', () => {
     if (!record) return;
     if (record.roomId) {
-      // Clean up voice chat
-      handleVoiceLeave(record.roomId, record.playerId, socket, io);
-
       const session = gameSessionStore.get(record.roomId);
       if (session) {
         session.markDisconnected(record.playerId);

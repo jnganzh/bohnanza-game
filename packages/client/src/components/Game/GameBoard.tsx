@@ -228,7 +228,7 @@ export function GameBoard() {
             gameState={gameState}
             isMyTurn={isMyTurn}
           />
-          <VoiceChatPanel />
+          <VoiceChatPanel roomId={useLobbyStore.getState().roomId ?? ''} playerName={useLobbyStore.getState().playerName} />
         </div>
       </div>
     </div>
