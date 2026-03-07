@@ -25,7 +25,7 @@ function loadJitsiScript(): Promise<void> {
     }
     scriptLoading = true;
     const script = document.createElement('script');
-    script.src = 'https://meet.jit.si/external_api.js';
+    script.src = 'https://meet.ffmuc.net/external_api.js';
     script.async = true;
     script.onload = () => {
       scriptLoaded = true;
@@ -49,7 +49,7 @@ export function VoiceChatPanel({ roomId, playerName }: VoiceChatPanelProps) {
     await loadJitsiScript();
     if (!containerRef.current) return;
 
-    const api = new window.JitsiMeetExternalAPI('meet.jit.si', {
+    const api = new window.JitsiMeetExternalAPI('meet.ffmuc.net', {
       roomName: `bohnanza-${roomId}`,
       parentNode: containerRef.current,
       userInfo: { displayName: playerName },
