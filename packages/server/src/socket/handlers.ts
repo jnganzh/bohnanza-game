@@ -375,6 +375,7 @@ export function registerHandlers(io: Server, socket: TypedSocket): void {
   // ---- Voice Chat ----
 
   socket.on('voice:join', () => {
+    console.log('[voice] voice:join from', record?.playerId, 'room:', record?.roomId);
     if (!record?.roomId) return;
     const roomId = record.roomId;
 
@@ -389,12 +390,14 @@ export function registerHandlers(io: Server, socket: TypedSocket): void {
       playerId: pid,
       playerName: name,
     }));
+    console.log('[voice] sending voice:peers to', record.playerId, ':', existingPeers.length, 'existing peers');
     socket.emit('voice:peers', { peers: existingPeers });
 
     // Add the new player
     voicePeers.set(record.playerId, record.playerName);
 
     // Notify existing voice peers about the new player (so they initiate connections)
+    console.log('[voice] broadcasting voice:peer-joined for', record.playerId, 'to room', roomId);
     socket.to(roomId).emit('voice:peer-joined', {
       playerId: record.playerId,
       playerName: record.playerName,

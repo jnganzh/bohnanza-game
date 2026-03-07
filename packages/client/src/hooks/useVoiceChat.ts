@@ -26,7 +26,6 @@ export function useVoiceChat() {
   const joinedRef = useRef(false);
   const pendingSignalsRef = useRef<Map<string, SimplePeer.SignalData[]>>(new Map());
 
-  // Sync peers map to state
   const syncPeersState = useCallback(() => {
     setPeers(
       Array.from(peersRef.current.values()).map((p) => ({
@@ -37,19 +36,64 @@ export function useVoiceChat() {
     );
   }, []);
 
-  // Set up voice activity detection on an audio stream
-  const detectSpeaking = useCallback(
-    (playerId: string, stream: MediaStream) => {
+  // Use refs for functions to avoid dependency churn in useEffect
+  const syncPeersRef = useRef(syncPeersState);
+  syncPeersRef.current = syncPeersState;
+
+  const createPeerRef = useRef<(playerId: string, playerName: string, initiator: boolean) => void>();
+
+  createPeerRef.current = (playerId: string, playerName: string, initiator: boolean) => {
+    if (!streamRef.current) {
+      console.log('[voice] createPeer: no stream, skipping', playerId);
+      return;
+    }
+    if (peersRef.current.has(playerId)) {
+      console.log('[voice] createPeer: already have peer', playerId);
+      return;
+    }
+
+    console.log('[voice] createPeer:', playerId, playerName, initiator ? 'initiator' : 'receiver');
+
+    const peer = new SimplePeer({
+      initiator,
+      stream: streamRef.current,
+      trickle: true,
+      config: {
+        iceServers: [
+          { urls: 'stun:stun.l.google.com:19302' },
+          { urls: 'stun:stun1.l.google.com:19302' },
+        ],
+      },
+    });
+
+    const voicePeer: VoicePeer = { playerId, playerName, peer, speaking: false };
+    peersRef.current.set(playerId, voicePeer);
+
+    peer.on('signal', (signal) => {
+      console.log('[voice] sending signal to', playerId);
+      socket.emit('voice:signal', { targetPlayerId: playerId, signal });
+    });
+
+    let cleanupDetect: (() => void) | null = null;
+
+    peer.on('stream', (remoteStream) => {
+      console.log('[voice] got stream from', playerId);
+      const audio = new Audio();
+      audio.srcObject = remoteStream;
+      audio.autoplay = true;
+      audio.play().catch(() => {});
+
+      // Voice activity detection
       try {
         const ctx = new AudioContext();
-        const source = ctx.createMediaStreamSource(stream);
+        const source = ctx.createMediaStreamSource(remoteStream);
         const analyser = ctx.createAnalyser();
         analyser.fftSize = 512;
         analyser.smoothingTimeConstant = 0.4;
         source.connect(analyser);
         const data = new Uint8Array(analyser.frequencyBinCount);
-
         let wasSpeaking = false;
+
         const interval = setInterval(() => {
           if (!peersRef.current.has(playerId)) {
             clearInterval(interval);
@@ -61,115 +105,77 @@ export function useVoiceChat() {
           const isSpeaking = avg > 15;
           if (isSpeaking !== wasSpeaking) {
             wasSpeaking = isSpeaking;
-            const peer = peersRef.current.get(playerId);
-            if (peer) {
-              peer.speaking = isSpeaking;
-              syncPeersState();
+            const p = peersRef.current.get(playerId);
+            if (p) {
+              p.speaking = isSpeaking;
+              syncPeersRef.current();
             }
           }
         }, 100);
 
-        return () => {
+        cleanupDetect = () => {
           clearInterval(interval);
           ctx.close();
         };
       } catch {
         // AudioContext not available
-        return () => {};
       }
-    },
-    [syncPeersState]
-  );
+    });
 
-  // Create a peer connection to a remote player
-  const createPeer = useCallback(
-    (playerId: string, playerName: string, initiator: boolean) => {
-      if (!streamRef.current) return;
-      if (peersRef.current.has(playerId)) return;
+    peer.on('connect', () => {
+      console.log('[voice] peer connected:', playerId);
+    });
 
-      const peer = new SimplePeer({
-        initiator,
-        stream: streamRef.current,
-        trickle: true,
-        config: {
-          iceServers: [
-            { urls: 'stun:stun.l.google.com:19302' },
-            { urls: 'stun:stun1.l.google.com:19302' },
-          ],
-        },
-      });
+    peer.on('close', () => {
+      console.log('[voice] peer closed:', playerId);
+      cleanupDetect?.();
+      peersRef.current.delete(playerId);
+      syncPeersRef.current();
+    });
 
-      const voicePeer: VoicePeer = { playerId, playerName, peer, speaking: false };
-      peersRef.current.set(playerId, voicePeer);
+    peer.on('error', (err) => {
+      console.log('[voice] peer error:', playerId, err.message);
+      cleanupDetect?.();
+      peersRef.current.delete(playerId);
+      syncPeersRef.current();
+    });
 
-      peer.on('signal', (signal) => {
-        socket.emit('voice:signal', { targetPlayerId: playerId, signal });
-      });
-
-      let cleanupDetect: (() => void) | null = null;
-
-      peer.on('stream', (remoteStream) => {
-        // Play audio
-        const audio = new Audio();
-        audio.srcObject = remoteStream;
-        audio.autoplay = true;
-        audio.play().catch(() => {});
-
-        // Detect speaking
-        cleanupDetect = detectSpeaking(playerId, remoteStream);
-      });
-
-      peer.on('close', () => {
-        cleanupDetect?.();
-        peersRef.current.delete(playerId);
-        syncPeersState();
-      });
-
-      peer.on('error', () => {
-        cleanupDetect?.();
-        peersRef.current.delete(playerId);
-        syncPeersState();
-      });
-
-      // Flush any signals that arrived before peer was created
-      const pending = pendingSignalsRef.current.get(playerId);
-      if (pending) {
-        for (const sig of pending) {
-          peer.signal(sig);
-        }
-        pendingSignalsRef.current.delete(playerId);
+    // Flush any signals that arrived before peer was created
+    const pending = pendingSignalsRef.current.get(playerId);
+    if (pending) {
+      console.log('[voice] flushing', pending.length, 'pending signals for', playerId);
+      for (const sig of pending) {
+        peer.signal(sig);
       }
+      pendingSignalsRef.current.delete(playerId);
+    }
 
-      syncPeersState();
-    },
-    [detectSpeaking, syncPeersState]
-  );
+    syncPeersRef.current();
+  };
 
-  // Socket event handlers
+  // Socket event handlers — registered once, use refs to avoid stale closures
   useEffect(() => {
     const onPeers = (data: { peers: { playerId: string; playerName: string }[] }) => {
+      console.log('[voice] received voice:peers', data.peers.length, 'peers');
       if (!joinedRef.current) return;
-      // Connect to all existing peers (we are the initiator)
       for (const p of data.peers) {
-        createPeer(p.playerId, p.playerName, true);
+        createPeerRef.current?.(p.playerId, p.playerName, true);
       }
     };
 
     const onPeerJoined = (data: { playerId: string; playerName: string }) => {
+      console.log('[voice] received voice:peer-joined', data.playerId, data.playerName);
       if (!joinedRef.current) return;
-      // New peer joined — they will initiate, we wait
-      // Actually: the existing peers initiate to the new joiner based on voice:peers
-      // But if we receive peer-joined, the new peer is initiating to us via voice:peers
-      // So we create a non-initiator peer
-      createPeer(data.playerId, data.playerName, false);
+      createPeerRef.current?.(data.playerId, data.playerName, false);
     };
 
     const onPeerLeft = (data: { playerId: string }) => {
+      console.log('[voice] received voice:peer-left', data.playerId);
       const vp = peersRef.current.get(data.playerId);
       if (vp) {
         vp.peer.destroy();
         peersRef.current.delete(data.playerId);
-        syncPeersState();
+        syncPeersRef.current();
       }
     };
 
@@ -179,7 +185,7 @@ export function useVoiceChat() {
       if (vp) {
         vp.peer.signal(data.signal as SimplePeer.SignalData);
       } else {
-        // Signal arrived before peer-joined event — buffer it
+        console.log('[voice] buffering signal from unknown peer', data.fromPlayerId);
         if (!pendingSignalsRef.current.has(data.fromPlayerId)) {
           pendingSignalsRef.current.set(data.fromPlayerId, []);
         }
@@ -198,7 +204,7 @@ export function useVoiceChat() {
       socket.off('voice:peer-left', onPeerLeft);
       socket.off('voice:signal', onSignal);
     };
-  }, [createPeer, syncPeersState]);
+  }, []); // Empty deps — stable listeners using refs
 
   const joinVoice = useCallback(async () => {
     try {
@@ -207,6 +213,7 @@ export function useVoiceChat() {
       streamRef.current = stream;
       joinedRef.current = true;
       setJoined(true);
+      console.log('[voice] joining voice, emitting voice:join');
       socket.emit('voice:join');
     } catch (err) {
       setError('Could not access microphone. Please allow mic permissions.');
@@ -217,21 +224,20 @@ export function useVoiceChat() {
     joinedRef.current = false;
     setJoined(false);
 
-    // Destroy all peers
     for (const [, vp] of peersRef.current) {
       vp.peer.destroy();
     }
     peersRef.current.clear();
-    syncPeersState();
+    pendingSignalsRef.current.clear();
+    syncPeersRef.current();
 
-    // Stop mic
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((t) => t.stop());
       streamRef.current = null;
     }
 
     socket.emit('voice:leave');
-  }, [syncPeersState]);
+  }, []);
 
   const toggleMute = useCallback(() => {
     if (!streamRef.current) return;
